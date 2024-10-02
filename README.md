@@ -1,4 +1,4 @@
-# Procedural Mesh Manipulation Using Voronoi Areas
+# Procedural Terrain Manipulation Using Voronoi Areas
 
 Once a playable demo is available, it will be linked here.
 
