@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WaveFunctionCollapse : MonoBehaviour
+public class TileGeneration : MonoBehaviour
 {
-    private static WaveFunctionCollapse _instance = null;
+    private static TileGeneration _instance = null;
 
-    public static WaveFunctionCollapse instance { get { return _instance; } }
+    public static TileGeneration instance { get { return _instance; } }
     
 
     [Header("General")]

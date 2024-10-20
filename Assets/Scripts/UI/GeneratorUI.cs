@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class GeneratorUI : MonoBehaviour
 {
-    private WaveFunctionCollapse wfcInstance;
+    private TileGeneration wfcInstance;
     
     #region Unity Callbacks
     private void Start()
     {
-        wfcInstance = WaveFunctionCollapse.instance;
+        wfcInstance = TileGeneration.instance;
     }
     #endregion // Unity Callbacks
 
