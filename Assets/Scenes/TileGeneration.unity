@@ -276,8 +276,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundTilePrefab: {fileID: 5797349560142819675, guid: 7fff52a1a668acd44acaf001d313d17c, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 10, y: 10}
+  rowsByColumns: {x: 13, y: 13}
   tileSize: {x: 1, y: 1}
+  kernelCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &64452861
 GameObject:
   m_ObjectHideFlags: 0
