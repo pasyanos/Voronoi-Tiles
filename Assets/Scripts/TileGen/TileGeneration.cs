@@ -7,7 +7,8 @@ using UnityEngine.UIElements;
 public enum TileType
 {
     WATER = 20,
-    GROUND = 50
+    GROUND = 72,
+    MOUNTAIN = 100
 }
 
 public class TileGeneration : MonoBehaviour
@@ -18,6 +19,7 @@ public class TileGeneration : MonoBehaviour
 
     [Header("Tiles")]
     [SerializeField] private GameObject groundTilePrefab;
+    [SerializeField] private GameObject mountainTilePrefab;
 
     [Header("Generation Settings")]
     [SerializeField] private Transform tileParent;
@@ -86,13 +88,21 @@ public class TileGeneration : MonoBehaviour
                 // spawn tile at posnAt, then move into a new position
                 // this will be replaced later, when generating mesh from scratch
                 GameObject instantiated = null;
-
+                
+                // it's a mountain tile
+                if (perlin > (int)TileType.GROUND)
+                {
+                    instantiated = Instantiate(mountainTilePrefab, tileParent);
+                    instantiated.transform.localPosition = _tileLocs[i,j];
+                    instantiated.name = string.Format("Mountain Tile {0}x{1}", i, j);
+                    _instantiatedTiles.Add(instantiated);
+                }
                 // it's a ground tile
-                if (perlin > (int)TileType.WATER)
+                else if (perlin > (int)TileType.WATER)
                 {
                     instantiated = Instantiate(groundTilePrefab, tileParent);
                     instantiated.transform.localPosition = _tileLocs[i,j];
-                    instantiated.name = string.Format("Tile {0}x{1}", i, j);
+                    instantiated.name = string.Format("Ground Tile {0}x{1}", i, j);
                     _instantiatedTiles.Add(instantiated);
                 }
                 // else water, do not instantiate anuthing
@@ -126,7 +136,7 @@ public class TileGeneration : MonoBehaviour
 
         // could move these to variables if we want more control
         float minScale = 0.01f;
-        float maxScale = 1.5f;
+        float maxScale = 1.75f;
 
         float halfX = Mathf.Ceil(rowsByColumns.x / 2.0f);
         float halfY = Mathf.Ceil(rowsByColumns.y / 2.0f);
