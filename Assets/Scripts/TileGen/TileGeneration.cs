@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
 public enum TileType
 {
     WATER = 20,
+    SHORE,
     GROUND = 72,
-    MOUNTAIN = 100
+    MOUNTAIN
 }
 
 public class TileGeneration : MonoBehaviour
@@ -57,9 +60,11 @@ public class TileGeneration : MonoBehaviour
     #region Private Helper Methods
     private void InstantiateTiles()
     {
-        _tileLocs = new Vector3[rowsByColumns.x, rowsByColumns.y];
         int rows = rowsByColumns.x;
         int columns = rowsByColumns.y;
+
+        _tileLocs = new Vector3[rows, columns];
+        _generatedTileTypes = new TileType[rows, columns];
 
         float minusXOffset = (float)(rows - 1)/2f*tileSize.x;
         float minusZOffset = (float)(columns - 1)/2f*tileSize.y;
@@ -87,30 +92,71 @@ public class TileGeneration : MonoBehaviour
 
                 // spawn tile at posnAt, then move into a new position
                 // this will be replaced later, when generating mesh from scratch
-                GameObject instantiated = null;
+                // GameObject instantiated = null;
                 
                 // it's a mountain tile
                 if (perlin > (int)TileType.GROUND)
                 {
-                    instantiated = Instantiate(mountainTilePrefab, tileParent);
-                    instantiated.transform.localPosition = _tileLocs[i,j];
-                    instantiated.name = string.Format("Mountain Tile {0}x{1}", i, j);
-                    _instantiatedTiles.Add(instantiated);
+                    // instantiated = Instantiate(mountainTilePrefab, tileParent);
+                    // instantiated.transform.localPosition = _tileLocs[i,j];
+                    // instantiated.name = string.Format("Mountain Tile {0}x{1}", i, j);
+                    // _instantiatedTiles.Add(instantiated);
+                    _generatedTileTypes[i, j] = TileType.MOUNTAIN;
                 }
                 // it's a ground tile
                 else if (perlin > (int)TileType.WATER)
                 {
-                    instantiated = Instantiate(groundTilePrefab, tileParent);
+                    // instantiated = Instantiate(groundTilePrefab, tileParent);
+                    // instantiated.transform.localPosition = _tileLocs[i,j];
+                    // instantiated.name = string.Format("Ground Tile {0}x{1}", i, j);
+                    // _instantiatedTiles.Add(instantiated);
+                    _generatedTileTypes[i, j] = TileType.GROUND;
+                }
+                // else water
+                else
+                {
+                    _generatedTileTypes[i, j] = TileType.WATER;
+                }
+            }
+        }
+
+        InstantiateAssets();
+    }
+
+    private void InstantiateAssets()
+    {
+        int rows = rowsByColumns.x;
+        int columns = rowsByColumns.y;
+        
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                GameObject instantiated = null;
+
+                TileType thisTileType = _generatedTileTypes[i, j];
+
+                switch(thisTileType)
+                {
+                    case TileType.MOUNTAIN:
+                        instantiated = Instantiate(mountainTilePrefab, tileParent);
+                        break;
+                    case TileType.GROUND:
+                        instantiated = Instantiate(groundTilePrefab, tileParent);
+                        break;
+                    // add additional cases here as they arise
+                    // if it's water, don't need to instantiate anything
+                    default:
+                        break;
+                }
+
+                // If we DID instantiate something, do a little extra positioning
+                if (instantiated != null)
+                {
                     instantiated.transform.localPosition = _tileLocs[i,j];
-                    instantiated.name = string.Format("Ground Tile {0}x{1}", i, j);
+                    instantiated.name = string.Format("Tile {0}x{1}", i, j);
                     _instantiatedTiles.Add(instantiated);
                 }
-                // else water, do not instantiate anuthing
-                
-                // instantiated= Instantiate(groundTilePrefab, tileParent);
-                // instantiated.transform.localPosition = _tileLocs[i,j];
-                // instantiated.name = string.Format("Tile {0}x{1}", i, j);
-                // _instantiatedTiles.Add(instantiated);
             }
         }
     }
@@ -152,15 +198,13 @@ public class TileGeneration : MonoBehaviour
                 * Mathf.Lerp(minScale, maxScale, kernelCurve.Evaluate(locY));
             }
         }
-
-        Debug.Log("Re-generating filter kernel");
+        // Debug.Log("Re-generating filter kernel");
     }
     #endregion // Private Helper Methods
 
     #region Public Facing Methods
     public void StartGeneration()
     {
-
         ClearPrevGeneration();
         InstantiateTiles();
     }

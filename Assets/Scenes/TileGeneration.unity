@@ -277,7 +277,7 @@ MonoBehaviour:
   groundTilePrefab: {fileID: 5797349560142819675, guid: 7fff52a1a668acd44acaf001d313d17c, type: 3}
   mountainTilePrefab: {fileID: 8584961761968529144, guid: 7d6e2ce9e5f5a8f41bc491dd8c4ed0c8, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 13, y: 13}
+  rowsByColumns: {x: 15, y: 15}
   tileSize: {x: 1, y: 1}
   kernelCurve:
     serializedVersion: 2
@@ -799,7 +799,7 @@ Transform:
   m_GameObject: {fileID: 1332916862}
   serializedVersion: 2
   m_LocalRotation: {x: 0.33675942, y: -0, z: -0, w: 0.9415907}
-  m_LocalPosition: {x: 0, y: 5.48, z: -8.53}
+  m_LocalPosition: {x: 0, y: 5.48, z: -9.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

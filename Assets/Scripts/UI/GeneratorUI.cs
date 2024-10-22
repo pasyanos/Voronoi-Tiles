@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class GeneratorUI : MonoBehaviour
 {
-    private TileGeneration wfcInstance;
+    private TileGeneration generatorInstance;
     
     #region Unity Callbacks
     private void Start()
     {
-        wfcInstance = TileGeneration.instance;
+        generatorInstance = TileGeneration.instance;
     }
     #endregion // Unity Callbacks
 
     #region Public Facing Methods
     public void OnClickGenerateTerrain()
     {
-        wfcInstance.StartGeneration();
+        generatorInstance.StartGeneration();
     }
     #endregion // Public Facing Methods 
 }
