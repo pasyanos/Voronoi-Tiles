@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 public enum TileType
 {
@@ -20,9 +16,10 @@ public class TileGeneration : MonoBehaviour
 
     public static TileGeneration instance { get { return _instance; } }
 
-    [Header("Tiles")]
+    [Header("Tile Prefabs")]
     [SerializeField] private GameObject groundTilePrefab;
     [SerializeField] private GameObject mountainTilePrefab;
+    [SerializeField] private GameObject shoreTilePrefab;
 
     [Header("Generation Settings")]
     [SerializeField] private Transform tileParent;
@@ -87,35 +84,40 @@ public class TileGeneration : MonoBehaviour
                 float perlin = Mathf.PerlinNoise(perlX, perlY);
                 // modulate by kernel, then multiply by 100 to get a percentage
                 perlin *= 100f * _kernel[i, j];
-
-                // Debug.LogError("Perlin kernel is " + perlin);
-
-                // spawn tile at posnAt, then move into a new position
-                // this will be replaced later, when generating mesh from scratch
-                // GameObject instantiated = null;
                 
                 // it's a mountain tile
                 if (perlin > (int)TileType.GROUND)
                 {
-                    // instantiated = Instantiate(mountainTilePrefab, tileParent);
-                    // instantiated.transform.localPosition = _tileLocs[i,j];
-                    // instantiated.name = string.Format("Mountain Tile {0}x{1}", i, j);
-                    // _instantiatedTiles.Add(instantiated);
                     _generatedTileTypes[i, j] = TileType.MOUNTAIN;
                 }
                 // it's a ground tile
                 else if (perlin > (int)TileType.WATER)
                 {
-                    // instantiated = Instantiate(groundTilePrefab, tileParent);
-                    // instantiated.transform.localPosition = _tileLocs[i,j];
-                    // instantiated.name = string.Format("Ground Tile {0}x{1}", i, j);
-                    // _instantiatedTiles.Add(instantiated);
                     _generatedTileTypes[i, j] = TileType.GROUND;
                 }
                 // else water
                 else
                 {
                     _generatedTileTypes[i, j] = TileType.WATER;
+                }
+            }
+        }
+
+        // If the width x height is more than 5, make any ground tile that is next to water a shore tile instead
+        if (rows > 5 && columns > 5)
+        {
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < columns; ++j)
+                {
+                    if (_generatedTileTypes[i, j] == TileType.GROUND)
+                    {
+                        var neighbors = GetNeighborTypes(i, j);
+
+                        if (neighbors.Contains(TileType.WATER))
+                            _generatedTileTypes[i, j] = TileType.SHORE;
+
+                    }
                 }
             }
         }
@@ -143,6 +145,9 @@ public class TileGeneration : MonoBehaviour
                         break;
                     case TileType.GROUND:
                         instantiated = Instantiate(groundTilePrefab, tileParent);
+                        break;
+                    case TileType.SHORE:
+                        instantiated = Instantiate(shoreTilePrefab, tileParent);
                         break;
                     // add additional cases here as they arise
                     // if it's water, don't need to instantiate anything
@@ -199,6 +204,56 @@ public class TileGeneration : MonoBehaviour
             }
         }
         // Debug.Log("Re-generating filter kernel");
+    }
+
+
+    // I only care about whether there's an instance of a terrain type, not how many
+    // so I'm using a hashset and not allowing duplicates.
+    private HashSet<TileType> GetNeighborTypes(int i, int j)
+    {
+        HashSet<TileType> ret = new HashSet<TileType>();
+        bool notTopRow = (i > 0);
+        bool notBottomRow = (i < rowsByColumns.x - 1);
+        bool notLeftEdgeCol = (j > 0);
+        bool notRightEdgeCol = (j < rowsByColumns.y - 1);
+
+        if (notTopRow)
+        {
+            // upper neighbor
+            ret.Add(_generatedTileTypes[i - 1, j]);
+
+            // upper left neighbor
+            if (notLeftEdgeCol)
+                ret.Add(_generatedTileTypes[i - 1, j - 1]);
+
+            // upper right neighbor
+            if (notRightEdgeCol)
+                ret.Add(_generatedTileTypes[i - 1, j + 1]);
+        }
+
+        // middle left neigbor
+        if (notLeftEdgeCol)
+            ret.Add(_generatedTileTypes[i, j - 1]);
+
+        // middle right neighbor
+        if (notRightEdgeCol)
+            ret.Add(_generatedTileTypes[i, j + 1]);
+
+        if (notBottomRow)
+        {
+            // lower neighbor
+            ret.Add(_generatedTileTypes[i + 1, j]);
+
+            // lower left neighbor
+            if (notLeftEdgeCol)
+                ret.Add(_generatedTileTypes[i + 1, j - 1]);
+
+            // lower right neighbor
+            if (notRightEdgeCol)
+                ret.Add(_generatedTileTypes[i + 1, j + 1]);
+        }
+
+        return ret;
     }
     #endregion // Private Helper Methods
 
