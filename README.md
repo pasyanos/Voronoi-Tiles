@@ -1,6 +1,6 @@
 # Procedural Terrain Manipulation Using Voronoi Areas
 
-Once a playable demo is available, it will be linked here.
+## A playable demo is available [here](https://pasyanos.github.io/Voronoi-Tiles/)!
 
 ### User Manual
 
