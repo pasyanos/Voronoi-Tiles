@@ -8,7 +8,7 @@ Information needed to operate the playable demo will go here.
 
 ## Project History
 
-A list of major project milestones will be listed here.
+- 10/27/24 - Basic tile generation with placeholder assets finalized.
 
 ## Tools
 
