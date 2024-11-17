@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum TileType
 {
-    WATER = 20,
+    WATER = 15,
     SHORE,
-    GROUND = 72,
+    GROUND = 70,
     MOUNTAIN
 }
 
@@ -26,6 +26,7 @@ public class TileGeneration : MonoBehaviour
     [SerializeField] private Vector2Int rowsByColumns = new Vector2Int(3, 3);
     [SerializeField] private Vector2 tileSize = new Vector2(1f, 1f);
     [SerializeField] private AnimationCurve kernelCurve;
+    [SerializeField] private bool offsetEvenColumns = true;
 
     // Runtime Vars
     private TileType[,] _generatedTileTypes;
@@ -66,6 +67,8 @@ public class TileGeneration : MonoBehaviour
         float minusXOffset = (float)(rows - 1)/2f*tileSize.x;
         float minusZOffset = (float)(columns - 1)/2f*tileSize.y;
 
+        Vector3 columnOffset;
+
         // use System datetime to seed Perlin noise
         System.DateTime curTime = System.DateTime.Now;
         int xOff = curTime.Second;
@@ -75,7 +78,10 @@ public class TileGeneration : MonoBehaviour
         {
             for (int j = 0; j < columns; ++j)
             {
-                _tileLocs[i, j] = new Vector3(- minusXOffset + tileSize.x*i, 0, -minusZOffset + tileSize.y*j);
+                columnOffset = offsetEvenColumns ? new Vector3(0, 0, (i % 2) * 0.5f * tileSize.x) 
+                    : Vector3.zero; // else
+
+                _tileLocs[i, j] = new Vector3(- minusXOffset + tileSize.x*i, 0, -minusZOffset + tileSize.y*j) + columnOffset;
 
                 // calculate location on 1x1 perlin texture, then sample it
                 float perlX = (float)((i + xOff) % rowsByColumns.x) / rowsByColumns.x;
@@ -186,7 +192,7 @@ public class TileGeneration : MonoBehaviour
         _kernel = new float[rowsByColumns.x, rowsByColumns.y];
 
         // could move these to variables if we want more control
-        float minScale = 0.01f;
+        float minScale = 0.1f;
         float maxScale = 1.75f;
 
         float halfX = Mathf.Ceil(rowsByColumns.x / 2.0f);
