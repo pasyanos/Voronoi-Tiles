@@ -307,6 +307,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   offsetEvenColumns: 0
+  randomAmt: 0.25
 --- !u!1 &64452861
 GameObject:
   m_ObjectHideFlags: 0

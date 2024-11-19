@@ -1,16 +1,7 @@
-using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.GameCenter;
 
-//public enum TerrainType
-//{
-//    WATER = 15,
-//    SHORE,
-//    GROUND = 70,
-//    MOUNTAIN
-//}
 
 public class TileGeneration : MonoBehaviour
 {
@@ -32,6 +23,7 @@ public class TileGeneration : MonoBehaviour
     [SerializeField] private Vector2 tileSize = new Vector2(1f, 1f);
     [SerializeField] private AnimationCurve kernelCurve;
     [SerializeField] private bool offsetEvenColumns = true;
+    [SerializeField] [Range(0f, 0.5f)] private float randomAmt = 0f;
 
     // Runtime Vars
     private TerrainType[,] _generatedTileTypes;
@@ -118,6 +110,7 @@ public class TileGeneration : MonoBehaviour
                         _generatedTileTypes[i, j] = TerrainType.WATER;
                     }
                 }
+                // force all edge tiles to watter
                 else
                 {
                     _generatedTileTypes[i, j] = TerrainType.WATER;
@@ -125,7 +118,7 @@ public class TileGeneration : MonoBehaviour
             }
         }
 
-        // If the width x height is more than 5, make any ground tile that is next to water a shore tile instead
+        // If the width x height is more than 8, make any ground tile that is next to water a shore tile instead
         if (rows > 8 && columns > 8)
         {
             for (int i = 0; i < rows; ++i)
@@ -144,16 +137,38 @@ public class TileGeneration : MonoBehaviour
             }
         }
 
+        var posnOffsets2D = Generate2DOffsets(rowsByColumns, _generatedTileTypes);
+
         meshGeneratorInstance.Init(
-            new DelauneyMeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, tileSize));
+            new DelauneyMeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
+            tileSize, _generatedTileTypes, posnOffsets2D));
 
         // todo: comment this out once mesh generating is done
         InstantiateAssets();
     }
 
-    private void Generate2DPoints()
+    private Vector2[,] Generate2DOffsets(Vector2Int size, TerrainType[,] types)
     {
+        Vector2[,] ret = new Vector2[size.x, size.y];
 
+        float xOff = UnityEngine.Random.Range(0, 1);
+        float yOff = UnityEngine.Random.Range(0, 1);
+
+        // init all to a zero vector
+        for (int i = 0; i < size.x; ++i)
+        {
+            for(int j = 0; j < size.y; ++j)
+            {
+                var posn = Vector2.zero;
+
+                // todo: fancy mods to posn here
+                Vector2 rand = new Vector2(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f));
+
+                ret[i, j] = posn + randomAmt*rand;
+            }
+        }
+
+        return ret;
     }
 
     private void InstantiateAssets()
@@ -181,7 +196,6 @@ public class TileGeneration : MonoBehaviour
                         instantiated = Instantiate(shoreTilePrefab, tileParent);
                         break;
                     // add additional cases here as they arise
-                    // if it's water, don't need to instantiate anything
                     default:
                         instantiated = Instantiate(waterTilePrefab, tileParent);
                         break;
