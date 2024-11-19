@@ -23,7 +23,7 @@ public class TileGeneration : MonoBehaviour
     [SerializeField] private Vector2 tileSize = new Vector2(1f, 1f);
     [SerializeField] private AnimationCurve kernelCurve;
     [SerializeField] private bool offsetEvenColumns = true;
-    [SerializeField] [Range(0f, 0.5f)] private float randomAmt = 0f;
+    [SerializeField] [Range(0f, 1f)] private float randomAmt = 0f;
 
     // Runtime Vars
     private TerrainType[,] _generatedTileTypes;
@@ -161,10 +161,12 @@ public class TileGeneration : MonoBehaviour
             {
                 var posn = Vector2.zero;
 
+                var columnOffset = offsetEvenColumns ? new Vector2(0, (i % 2) * 0.5f) : Vector2.zero; // else
+
                 // todo: fancy mods to posn here
                 Vector2 rand = new Vector2(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f));
 
-                ret[i, j] = posn + randomAmt*rand;
+                ret[i, j] = posn + randomAmt*rand + columnOffset;
             }
         }
 
