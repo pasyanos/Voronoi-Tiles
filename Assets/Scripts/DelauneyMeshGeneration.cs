@@ -15,7 +15,7 @@ public class DelauneyMeshGeneration : MonoBehaviour
         // these are used by the rectangle class for generation
         public float _lenX;
         public float _lenY;
-        // public Vector2[,] points2D;
+   
         public List<Vector2> pointLocs;
         public Rect rect;
 
@@ -26,16 +26,16 @@ public class DelauneyMeshGeneration : MonoBehaviour
             _dimensions = dimensions;
             _tileSize = tileSize;
             
-            // adding 2 to the dimensions gives just a bit of extra wiggle room
-            _lenX = (dimensions.x + 2) * tileSize.x;
-            _lenY = (dimensions.y + 2) * tileSize.y;
+            // adding on to the dimensions gives just a bit of wiggle room
+            _lenX = (dimensions.x + 1) * tileSize.x;
+            _lenY = (dimensions.y + 1) * tileSize.y;
 
             // points2D = new Vector2[dimensions.x, dimensions.y];
             pointLocs = new List<Vector2>();
 
             rect = new Rect(0, 0, _lenX, _lenY);
 
-            Vector2 startingPt = new Vector2(_tileSize.x*1.5f, _tileSize.y*1.5f);
+            Vector2 startingPt = new Vector2(_tileSize.x*0.75f, _tileSize.y*0.75f);
             Vector2 thisOffset;
 
             // translate offsets to 2D positions
@@ -81,11 +81,8 @@ public class DelauneyMeshGeneration : MonoBehaviour
                 genData._origin.y, genData._origin.z - offsetY / 2f);
 
             Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, offsetY), lowerLeft);
-                // new Vector3(lowerLeft.x, lowerLeft.y, lowerLeft.z + offsetY);
             Vector3 upperRight = ProjectToXZPlane(new Vector2(offsetX, offsetY), lowerLeft);
-                // new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z + offsetY);
             Vector3 lowerRight = ProjectToXZPlane(new Vector2(offsetX, 0), lowerLeft);
-                // new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z);
 
             Gizmos.DrawLine(lowerLeft, upperLeft);
             Gizmos.DrawLine(upperLeft, upperRight);
