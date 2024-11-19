@@ -11,7 +11,7 @@ public class VoronoiDemo : MonoBehaviour
 
 	private List<Vector2> m_points;
 	private float m_mapWidth = 100;
-	private float m_mapHeight = 50;
+	private float m_mapHeight = 100;
 	private List<LineSegment> m_edges = null;
 	private List<LineSegment> m_spanningTree;
 	private List<LineSegment> m_delaunayTriangulation;

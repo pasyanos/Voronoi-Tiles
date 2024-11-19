@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &49775580
 Transform:
   m_ObjectHideFlags: 0
@@ -253,7 +253,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 50925069}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -261,7 +261,7 @@ Transform:
   - {fileID: 1373668573}
   - {fileID: 49775580}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &50925071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,11 +274,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e712959900ca56c4fa550322a2bb6d83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meshGeneratorInstance: {fileID: 120179651}
   groundTilePrefab: {fileID: 5797349560142819675, guid: 7fff52a1a668acd44acaf001d313d17c, type: 3}
   mountainTilePrefab: {fileID: 8584961761968529144, guid: 7d6e2ce9e5f5a8f41bc491dd8c4ed0c8, type: 3}
   shoreTilePrefab: {fileID: 6537959376020014348, guid: da9cf2f009dfcc9418afc611f2508b90, type: 3}
+  waterTilePrefab: {fileID: 7370305451353332119, guid: 75316192f569d784789c4e894a5ec5a5, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 15, y: 15}
+  rowsByColumns: {x: 10, y: 10}
   tileSize: {x: 1, y: 1}
   kernelCurve:
     serializedVersion: 2
@@ -304,7 +306,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  offsetEvenColumns: 1
+  offsetEvenColumns: 0
 --- !u!1 &64452861
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,6 +451,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7726a4256139ba42a315b25c056e0fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  waterSetting:
+    type: 10
+    yValue: -1
+    color: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 1}
+  shoreSetting:
+    type: 11
+    yValue: 0.25
+    color: {r: 0.8679245, g: 0.7349382, b: 0.5608757, a: 1}
+  groundSetting:
+    type: 70
+    yValue: 0.5
+    color: {r: 0.7196284, g: 0.7830189, b: 0.32872018, a: 1}
+  mountainSetting:
+    type: 71
+    yValue: 1.75
+    color: {r: 0.34190756, g: 0.4716981, b: 0.22917409, a: 1}
 --- !u!4 &120179652
 Transform:
   m_ObjectHideFlags: 0

@@ -1,14 +1,16 @@
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.GameCenter;
 
-public enum TileType
-{
-    WATER = 15,
-    SHORE,
-    GROUND = 70,
-    MOUNTAIN
-}
+//public enum TerrainType
+//{
+//    WATER = 15,
+//    SHORE,
+//    GROUND = 70,
+//    MOUNTAIN
+//}
 
 public class TileGeneration : MonoBehaviour
 {
@@ -16,10 +18,13 @@ public class TileGeneration : MonoBehaviour
 
     public static TileGeneration instance { get { return _instance; } }
 
+    [SerializeField] private DelauneyMeshGeneration meshGeneratorInstance;
+
     [Header("Tile Prefabs")]
     [SerializeField] private GameObject groundTilePrefab;
     [SerializeField] private GameObject mountainTilePrefab;
     [SerializeField] private GameObject shoreTilePrefab;
+    [SerializeField] private GameObject waterTilePrefab;
 
     [Header("Generation Settings")]
     [SerializeField] private Transform tileParent;
@@ -29,10 +34,12 @@ public class TileGeneration : MonoBehaviour
     [SerializeField] private bool offsetEvenColumns = true;
 
     // Runtime Vars
-    private TileType[,] _generatedTileTypes;
+    private TerrainType[,] _generatedTileTypes;
     private Vector3[,] _tileLocs;
+    private Vector2[,] _terrainLocs2D;
+
     /*
-     * I am referring to this losely as a kernel, because I got the idea from filter kernels
+     * I am referring to this loosely as a kernel, because I got the idea from filter kernels
      * used in computer vision. I'm not sure that's actually the correct technical term though.
     */
     private float[,] _kernel;
@@ -62,7 +69,8 @@ public class TileGeneration : MonoBehaviour
         int columns = rowsByColumns.y;
 
         _tileLocs = new Vector3[rows, columns];
-        _generatedTileTypes = new TileType[rows, columns];
+        _generatedTileTypes = new TerrainType[rows, columns];
+        _terrainLocs2D = new Vector2[rows, columns];
 
         float minusXOffset = (float)(rows - 1)/2f*tileSize.x;
         float minusZOffset = (float)(columns - 1)/2f*tileSize.y;
@@ -83,52 +91,69 @@ public class TileGeneration : MonoBehaviour
 
                 _tileLocs[i, j] = new Vector3(- minusXOffset + tileSize.x*i, 0, -minusZOffset + tileSize.y*j) + columnOffset;
 
-                // calculate location on 1x1 perlin texture, then sample it
-                float perlX = (float)((i + xOff) % rowsByColumns.x) / rowsByColumns.x;
-                float perlY = (float)((j + yOff) % rowsByColumns.y) / rowsByColumns.y;
+                if (i > 0 && j > 0 && i < rows - 1 && j < columns - 1)
+                {
 
-                float perlin = Mathf.PerlinNoise(perlX, perlY);
-                // modulate by kernel, then multiply by 100 to get a percentage
-                perlin *= 100f * _kernel[i, j];
-                
-                // it's a mountain tile
-                if (perlin > (int)TileType.GROUND)
-                {
-                    _generatedTileTypes[i, j] = TileType.MOUNTAIN;
+                    // calculate location on 1x1 perlin texture, then sample it
+                    float perlX = (float)((i + xOff) % rowsByColumns.x) / rowsByColumns.x;
+                    float perlY = (float)((j + yOff) % rowsByColumns.y) / rowsByColumns.y;
+
+                    float perlin = Mathf.PerlinNoise(perlX, perlY);
+                    // modulate by kernel, then multiply by 100 to get a percentage
+                    perlin *= 100f * _kernel[i, j];
+
+                    // it's a mountain tile
+                    if (perlin > (int)TerrainType.GROUND)
+                    {
+                        _generatedTileTypes[i, j] = TerrainType.MOUNTAIN;
+                    }
+                    // it's a ground tile
+                    else if (perlin > (int)TerrainType.WATER)
+                    {
+                        _generatedTileTypes[i, j] = TerrainType.GROUND;
+                    }
+                    // else water
+                    else
+                    {
+                        _generatedTileTypes[i, j] = TerrainType.WATER;
+                    }
                 }
-                // it's a ground tile
-                else if (perlin > (int)TileType.WATER)
-                {
-                    _generatedTileTypes[i, j] = TileType.GROUND;
-                }
-                // else water
                 else
                 {
-                    _generatedTileTypes[i, j] = TileType.WATER;
+                    _generatedTileTypes[i, j] = TerrainType.WATER;
                 }
             }
         }
 
         // If the width x height is more than 5, make any ground tile that is next to water a shore tile instead
-        if (rows > 5 && columns > 5)
+        if (rows > 8 && columns > 8)
         {
             for (int i = 0; i < rows; ++i)
             {
                 for (int j = 0; j < columns; ++j)
                 {
-                    if (_generatedTileTypes[i, j] == TileType.GROUND)
+                    if (_generatedTileTypes[i, j] == TerrainType.GROUND)
                     {
                         var neighbors = GetNeighborTypes(i, j);
 
-                        if (neighbors.Contains(TileType.WATER))
-                            _generatedTileTypes[i, j] = TileType.SHORE;
+                        if (neighbors.Contains(TerrainType.WATER))
+                            _generatedTileTypes[i, j] = TerrainType.SHORE;
 
                     }
                 }
             }
         }
 
+        meshGeneratorInstance.Init(
+            new DelauneyMeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, tileSize));
+
+        // todo: comment this out once mesh generating is done
         InstantiateAssets();
+    }
+
+    private void Generate2DPoints()
+    {
+
     }
 
     private void InstantiateAssets()
@@ -142,22 +167,23 @@ public class TileGeneration : MonoBehaviour
             {
                 GameObject instantiated = null;
 
-                TileType thisTileType = _generatedTileTypes[i, j];
+                TerrainType thisTileType = _generatedTileTypes[i, j];
 
                 switch(thisTileType)
                 {
-                    case TileType.MOUNTAIN:
+                    case TerrainType.MOUNTAIN:
                         instantiated = Instantiate(mountainTilePrefab, tileParent);
                         break;
-                    case TileType.GROUND:
+                    case TerrainType.GROUND:
                         instantiated = Instantiate(groundTilePrefab, tileParent);
                         break;
-                    case TileType.SHORE:
+                    case TerrainType.SHORE:
                         instantiated = Instantiate(shoreTilePrefab, tileParent);
                         break;
                     // add additional cases here as they arise
                     // if it's water, don't need to instantiate anything
                     default:
+                        instantiated = Instantiate(waterTilePrefab, tileParent);
                         break;
                 }
 
@@ -215,9 +241,9 @@ public class TileGeneration : MonoBehaviour
 
     // I only care about whether there's an instance of a terrain type, not how many
     // so I'm using a hashset and not allowing duplicates.
-    private HashSet<TileType> GetNeighborTypes(int i, int j)
+    private HashSet<TerrainType> GetNeighborTypes(int i, int j)
     {
-        HashSet<TileType> ret = new HashSet<TileType>();
+        HashSet<TerrainType> ret = new HashSet<TerrainType>();
         bool notTopRow = (i > 0);
         bool notBottomRow = (i < rowsByColumns.x - 1);
         bool notLeftEdgeCol = (j > 0);
