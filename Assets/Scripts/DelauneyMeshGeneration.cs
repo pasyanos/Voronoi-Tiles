@@ -77,57 +77,48 @@ public class DelauneyMeshGeneration : MonoBehaviour
             Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX/2f, 
                 genData._origin.y, genData._origin.z - offsetY / 2f);
 
-            Vector3 upperLeft = new Vector3(lowerLeft.x, lowerLeft.y, lowerLeft.z + offsetY);
-            Vector3 upperRight = new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z + offsetY);
-            Vector3 lowerRight = new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z);
+            Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, offsetY), lowerLeft);
+                // new Vector3(lowerLeft.x, lowerLeft.y, lowerLeft.z + offsetY);
+            Vector3 upperRight = ProjectToXZPlane(new Vector2(offsetX, offsetY), lowerLeft);
+                // new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z + offsetY);
+            Vector3 lowerRight = ProjectToXZPlane(new Vector2(offsetX, 0), lowerLeft);
+                // new Vector3(lowerLeft.x + offsetX, lowerLeft.y, lowerLeft.z);
 
             Gizmos.DrawLine(lowerLeft, upperLeft);
             Gizmos.DrawLine(upperLeft, upperRight);
             Gizmos.DrawLine(upperRight, lowerRight);
             Gizmos.DrawLine(lowerRight, lowerLeft);
 
-            //for (int i = 0; i < genData._dimensions.x; i++)
-            //{
-            //    for (int j = 0; j < genData._dimensions.y; j++)
-            //    {
-            //        var pt = lowerLeft + new Vector3(genData.points2D[i, j].x, 0, genData.points2D[i, j].y);
-            //        Gizmos.DrawCube(pt, new Vector3(0.1f, 0.1f, 0.1f));
-            //    }
-            //}
-
-            //foreach (var posn in genData.pointLocs)
-            //{
-            //    var pt = lowerLeft + new Vector3(posn.x, 0, posn.y);
-            //    Gizmos.DrawCube(pt, new Vector3(0.1f, 0.1f, 0.1f));
-            //}
-
             if (_voronoiEdges != null)
             {
                 Gizmos.color = Color.white;
                 for (int i = 0; i < _voronoiEdges.Count; i++)
                 {
-                    Vector2 left = (Vector2)_voronoiEdges[i].p0;
-                    Vector2 right = (Vector2)_voronoiEdges[i].p1;
-                    Gizmos.DrawLine((Vector3)left, (Vector3)right);
+                    var left3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p0, lowerLeft);
+                    var right3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p1, lowerLeft);
+                    Gizmos.DrawLine(left3D, right3D);
                 }
             }
 
             if (_triangulation != null)
             {
-                Gizmos.color = Color.magenta;
+                Gizmos.color = Color.green;
                 for (int i = 0; i < _triangulation.Count; i++)
                 {
-                    Vector2 left = (Vector2)_triangulation[i].p0;
-                    Vector2 right = (Vector2)_triangulation[i].p1;
-                    Gizmos.DrawLine((Vector3)left, (Vector3)right);
+                    //Vector2 left = (Vector2)_triangulation[i].p0;
+                    var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
+                    //Vector2 right = (Vector2)_triangulation[i].p1;
+                    var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
+                    Gizmos.DrawLine((Vector3)left3D, (Vector3)right3D);
                 }
             }
 
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.magenta;
 
             foreach (var posn in genData.pointLocs)
             {
-                Gizmos.DrawCube(posn, new Vector3(0.1f, 0.1f, 0.1f));
+                var posn3D = ProjectToXZPlane(posn, lowerLeft);
+                Gizmos.DrawSphere(posn3D, 0.05f);
             }
         }
     }
@@ -153,4 +144,14 @@ public class DelauneyMeshGeneration : MonoBehaviour
     {
 
     }
+
+    #region Misc Helpers
+    private static Vector3 ProjectToXZPlane(Vector2 rectPosn, Vector3 lowerLeftPoint)
+    {
+        float x = lowerLeftPoint.x + rectPosn.x;
+        float y = lowerLeftPoint.y;
+        float z = lowerLeftPoint.z + rectPosn.y;
+        return new Vector3(x, y, z);
+    }
+    #endregion
 }

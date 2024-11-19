@@ -149,8 +149,8 @@ public class TileGeneration : MonoBehaviour
             new DelauneyMeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
             tileSize, _generatedTileTypes, posnOffsets2D));
 
-        // todo: comment this out once mesh generating is done
-        InstantiateAssets();
+        // commenting this out to begin generating my own mesh
+        // InstantiateAssets();
     }
 
     private Vector2[,] Generate2DOffsets(Vector2Int size, TerrainType[,] types)
