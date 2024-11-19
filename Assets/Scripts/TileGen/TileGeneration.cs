@@ -13,7 +13,8 @@ public class TileGeneration : MonoBehaviour
 
     [Header("Tile Prefabs")]
     [SerializeField] private GameObject groundTilePrefab;
-    [SerializeField] private GameObject mountainTilePrefab;
+    [SerializeField] private GameObject lowMountTilePrefab;
+    [SerializeField] private GameObject highMountTilePrefab;
     [SerializeField] private GameObject shoreTilePrefab;
     [SerializeField] private GameObject waterTilePrefab;
 
@@ -94,13 +95,18 @@ public class TileGeneration : MonoBehaviour
                     // modulate by kernel, then multiply by 100 to get a percentage
                     perlin *= 100f * _kernel[i, j];
 
-                    // it's a mountain tile
-                    if (perlin > (int)TerrainType.GROUND)
+                    // it's a high mountain tile
+                    if (perlin > (int)TerrainType.MOUNTAIN)
                     {
                         _generatedTileTypes[i, j] = TerrainType.MOUNTAIN;
                     }
+                    // it's a low mountain tile
+                    else if (perlin > (int)TerrainType.LOWMOUNTAIN)
+                    {
+                        _generatedTileTypes[i, j] = TerrainType.LOWMOUNTAIN;
+                    }
                     // it's a ground tile
-                    else if (perlin > (int)TerrainType.WATER)
+                    else if (perlin > (int)TerrainType.GROUND)
                     {
                         _generatedTileTypes[i, j] = TerrainType.GROUND;
                     }
@@ -189,7 +195,10 @@ public class TileGeneration : MonoBehaviour
                 switch(thisTileType)
                 {
                     case TerrainType.MOUNTAIN:
-                        instantiated = Instantiate(mountainTilePrefab, tileParent);
+                        instantiated = Instantiate(highMountTilePrefab, tileParent);
+                        break;
+                    case TerrainType.LOWMOUNTAIN:
+                        instantiated = Instantiate(lowMountTilePrefab, tileParent);
                         break;
                     case TerrainType.GROUND:
                         instantiated = Instantiate(groundTilePrefab, tileParent);
@@ -235,7 +244,7 @@ public class TileGeneration : MonoBehaviour
 
         // could move these to variables if we want more control
         float minScale = 0.1f;
-        float maxScale = 1.75f;
+        float maxScale = 1.1f;
 
         float halfX = Mathf.Ceil(rowsByColumns.x / 2.0f);
         float halfY = Mathf.Ceil(rowsByColumns.y / 2.0f);

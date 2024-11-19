@@ -276,12 +276,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshGeneratorInstance: {fileID: 120179651}
   groundTilePrefab: {fileID: 5797349560142819675, guid: 7fff52a1a668acd44acaf001d313d17c, type: 3}
-  mountainTilePrefab: {fileID: 8584961761968529144, guid: 7d6e2ce9e5f5a8f41bc491dd8c4ed0c8, type: 3}
+  lowMountTilePrefab: {fileID: 8584961761968529144, guid: 7d6e2ce9e5f5a8f41bc491dd8c4ed0c8, type: 3}
+  highMountTilePrefab: {fileID: 6701887905352986702, guid: d0e227bf1cd30dd498c8ad0c749aa9d6, type: 3}
   shoreTilePrefab: {fileID: 6537959376020014348, guid: da9cf2f009dfcc9418afc611f2508b90, type: 3}
   waterTilePrefab: {fileID: 7370305451353332119, guid: 75316192f569d784789c4e894a5ec5a5, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 10, y: 10}
-  tileSize: {x: 1, y: 1}
+  rowsByColumns: {x: 20, y: 20}
+  tileSize: {x: 0.5, y: 0.5}
   kernelCurve:
     serializedVersion: 2
     m_Curve:
@@ -464,10 +465,14 @@ MonoBehaviour:
     type: 70
     yValue: 0.5
     color: {r: 0.7196284, g: 0.7830189, b: 0.32872018, a: 1}
-  mountainSetting:
-    type: 71
-    yValue: 1.75
-    color: {r: 0.34190756, g: 0.4716981, b: 0.22917409, a: 1}
+  lowMountSetting:
+    type: 0
+    yValue: 1
+    color: {r: 0.8197565, g: 0.8584906, b: 0.66816485, a: 1}
+  highMountSetting:
+    type: 0
+    yValue: 2
+    color: {r: 0.3066038, g: 0.28031695, b: 0.2646627, a: 1}
 --- !u!4 &120179652
 Transform:
   m_ObjectHideFlags: 0
@@ -885,7 +890,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1373668573
 Transform:
   m_ObjectHideFlags: 0

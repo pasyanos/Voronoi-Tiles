@@ -55,7 +55,8 @@ public class DelauneyMeshGeneration : MonoBehaviour
     [SerializeField] private TerrainSetting waterSetting;
     [SerializeField] private TerrainSetting shoreSetting;
     [SerializeField] private TerrainSetting groundSetting;
-    [SerializeField] private TerrainSetting mountainSetting;
+    [SerializeField] private TerrainSetting lowMountSetting;
+    [SerializeField] private TerrainSetting highMountSetting;
 
     // Runtime vars
     private bool wasInit = false;
