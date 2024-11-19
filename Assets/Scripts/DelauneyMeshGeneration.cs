@@ -50,7 +50,10 @@ public class DelauneyMeshGeneration : MonoBehaviour
             }
         }
     }
-    
+
+    [Header("Debug Stuff")]
+    [SerializeField] private bool showTriangulation = true;
+
     [Header("Terrain Type Settings")]
     [SerializeField] private TerrainSetting waterSetting;
     [SerializeField] private TerrainSetting shoreSetting;
@@ -100,7 +103,7 @@ public class DelauneyMeshGeneration : MonoBehaviour
                 }
             }
 
-            if (_triangulation != null)
+            if (_triangulation != null && showTriangulation)
             {
                 Gizmos.color = Color.green;
                 for (int i = 0; i < _triangulation.Count; i++)

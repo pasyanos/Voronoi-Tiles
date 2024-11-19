@@ -52,6 +52,7 @@ public class TileGeneration : MonoBehaviour
         }
 
         ClearPrevGeneration();
+        InstantiateTiles();
     }
     #endregion // Unity Callbacks
 
