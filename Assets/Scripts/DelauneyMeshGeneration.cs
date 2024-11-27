@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Delaunay.Geo;
+using Unity.Properties;
 
 
 public class DelauneyMeshGeneration : MonoBehaviour
@@ -11,12 +12,14 @@ public class DelauneyMeshGeneration : MonoBehaviour
         public Vector3 _origin;
         public Vector2Int _dimensions;
         public Vector2 _tileSize;
+        public int length;
 
         // these are used by the rectangle class for generation
         public float _lenX;
         public float _lenY;
    
         public List<Vector2> pointLocs;
+        public List<TerrainType> terrain1D;
         public Rect rect;
 
         public GenerationData(Vector3 origin, Vector2Int dimensions, Vector2 tileSize, 
@@ -32,6 +35,7 @@ public class DelauneyMeshGeneration : MonoBehaviour
 
             // points2D = new Vector2[dimensions.x, dimensions.y];
             pointLocs = new List<Vector2>();
+            terrain1D = new List<TerrainType>();
 
             rect = new Rect(0, 0, _lenX, _lenY);
 
@@ -46,8 +50,11 @@ public class DelauneyMeshGeneration : MonoBehaviour
                     thisOffset = new Vector2(i * tileSize.x, j * tileSize.y);
                     // points2D[i, j] = startingPt + thisOffset + posnOffsets[i, j];
                     pointLocs.Add(startingPt + thisOffset + posnOffsets[i, j]);
+                    terrain1D.Add(terrainTypes[i, j]);
                 }
             }
+
+            length = pointLocs.Count;
         }
     }
 
@@ -91,6 +98,7 @@ public class DelauneyMeshGeneration : MonoBehaviour
 
             if (_voronoiEdges != null)
             {
+                
                 Gizmos.color = Color.white;
                 for (int i = 0; i < _voronoiEdges.Count; i++)
                 {
@@ -105,22 +113,25 @@ public class DelauneyMeshGeneration : MonoBehaviour
                 Gizmos.color = Color.green;
                 for (int i = 0; i < _triangulation.Count; i++)
                 {
-                    //Vector2 left = (Vector2)_triangulation[i].p0;
                     var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
-                    //Vector2 right = (Vector2)_triangulation[i].p1;
                     var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
-                    Gizmos.DrawLine((Vector3)left3D, (Vector3)right3D);
+                    Gizmos.DrawLine(left3D, right3D);
                 }
             }
 
-            Gizmos.color = Color.magenta;
+            //Gizmos.color = Color.magenta;
 
-            foreach (var posn in genData.pointLocs)
-            {
-                var posn3D = ProjectToXZPlane(posn, lowerLeft);
-                Gizmos.DrawSphere(posn3D, 0.05f);
-            }
+            //foreach (var posn in genData.pointLocs)
+            //{
+            //    var posn3D = ProjectToXZPlane(posn, lowerLeft);
+            //    Gizmos.DrawSphere(posn3D, 0.05f);
+            //}
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+
     }
 
     public void Init(GenerationData data)
@@ -142,7 +153,10 @@ public class DelauneyMeshGeneration : MonoBehaviour
 
     private void GenerateMesh()
     {
-
+        if (_voronoi != null)
+        {
+            // Debug.LogErrorFormat("I have {0} sites", _voronoi.Regions().Count);
+        }
     }
 
     #region Misc Helpers
@@ -152,6 +166,25 @@ public class DelauneyMeshGeneration : MonoBehaviour
         float y = lowerLeftPoint.y;
         float z = lowerLeftPoint.z + rectPosn.y;
         return new Vector3(x, y, z);
+    }
+
+
+
+    private TerrainSetting Setting(TerrainType tType)
+    {
+        switch (tType)
+        {
+            case TerrainType.MOUNTAIN:
+                return highMountSetting;
+            case TerrainType.LOWMOUNTAIN:
+                return lowMountSetting;
+            case TerrainType.GROUND:
+                return groundSetting;
+            case TerrainType.SHORE:
+                return shoreSetting;
+            default:
+                return waterSetting;
+        }
     }
     #endregion
 }

@@ -281,8 +281,8 @@ MonoBehaviour:
   shoreTilePrefab: {fileID: 6537959376020014348, guid: da9cf2f009dfcc9418afc611f2508b90, type: 3}
   waterTilePrefab: {fileID: 7370305451353332119, guid: 75316192f569d784789c4e894a5ec5a5, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 10, y: 10}
-  tileSize: {x: 1, y: 1}
+  rowsByColumns: {x: 4, y: 4}
+  tileSize: {x: 2, y: 2}
   kernelCurve:
     serializedVersion: 2
     m_Curve:
@@ -453,6 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7726a4256139ba42a315b25c056e0fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showTriangulation: 0
   waterSetting:
     type: 10
     yValue: -1
