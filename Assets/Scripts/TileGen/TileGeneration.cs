@@ -9,7 +9,7 @@ public class TileGeneration : MonoBehaviour
 
     public static TileGeneration instance { get { return _instance; } }
 
-    [SerializeField] private DelauneyMeshGeneration meshGeneratorInstance;
+    [SerializeField] private MeshGeneration meshGeneratorInstance;
 
     [Header("Tile Prefabs")]
     [SerializeField] private GameObject groundTilePrefab;
@@ -147,7 +147,7 @@ public class TileGeneration : MonoBehaviour
         var posnOffsets2D = Generate2DOffsets(rowsByColumns, _generatedTileTypes);
 
         meshGeneratorInstance.Init(
-            new DelauneyMeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
+            new MeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
             tileSize, _generatedTileTypes, posnOffsets2D));
 
         // commenting this out to begin generating my own mesh

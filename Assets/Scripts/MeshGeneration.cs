@@ -5,7 +5,7 @@ using Delaunay.Geo;
 using Unity.Properties;
 
 
-public class DelauneyMeshGeneration : MonoBehaviour
+public class MeshGeneration : MonoBehaviour
 {
     public class GenerationData
     {
@@ -60,6 +60,7 @@ public class DelauneyMeshGeneration : MonoBehaviour
 
     [Header("Debug Stuff")]
     [SerializeField] private bool showTriangulation = true;
+    [SerializeField] private bool delauneyMesh = false;
 
     [Header("Terrain Type Settings")]
     [SerializeField] private TerrainSetting waterSetting;
@@ -141,22 +142,38 @@ public class DelauneyMeshGeneration : MonoBehaviour
 
         genData = data;
 
-        // todo: add mesh generation here
         _voronoi = new Delaunay.Voronoi(genData.pointLocs, null, genData.rect);
         _voronoiEdges = _voronoi.VoronoiDiagram();
-        _triangulation = _voronoi.DelaunayTriangulation();
+        // not currently needed
+        // _triangulation = _voronoi.DelaunayTriangulation();
 
-        GenerateMesh();
+        GenerateMeshVoronoi();
 
         wasInit = true;
     }
 
-    private void GenerateMesh()
+    private void GenerateMeshVoronoi()
     {
         if (_voronoi != null)
         {
-            // Debug.LogErrorFormat("I have {0} sites", _voronoi.Regions().Count);
+            for (int i = 0; i < genData.length; i++)
+            {
+                TerrainType curType = genData.terrain1D[i];
+                Vector2 curLocation = genData.pointLocs[i];
+
+                var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
+                Debug.LogErrorFormat("Site at ({0}, {1}) has {2} line segments", 
+                    curLocation.x, curLocation.y, voronoiSiteInfo.Count);
+
+                // todo: figure out if we need additional line segments if the area is bound by the bounding box
+                // as opposed to other line segments
+            }
         }
+    }
+
+    private void GenerateMeshDelauney()
+    {
+        // todo:
     }
 
     #region Misc Helpers
