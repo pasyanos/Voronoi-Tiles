@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/*
+ * Stores the information for a single face of the terrain map. A list of these should be passed
+ * along to TerrainMeshInformation which will conglomerate it and then pass it to a mesh.
+ */ 
 public class MeshInformation
 {
     // storing vertices, tris, etc, as lists privately, so I can easily add to them.
@@ -11,10 +16,16 @@ public class MeshInformation
     {
         get { return _vertices.ToArray(); }
     }
+
     private List<int> _triangles = new List<int>();
     public int[] triangles
     {
         get { return _triangles.ToArray(); }
+    }
+
+    public int vertexCount
+    {
+        get { return _vertices.Count; }
     }
 
     public MeshInformation(List<Vector2> polygon, float yVal)

@@ -281,7 +281,7 @@ MonoBehaviour:
   shoreTilePrefab: {fileID: 6537959376020014348, guid: da9cf2f009dfcc9418afc611f2508b90, type: 3}
   waterTilePrefab: {fileID: 7370305451353332119, guid: 75316192f569d784789c4e894a5ec5a5, type: 3}
   tileParent: {fileID: 1373668573}
-  rowsByColumns: {x: 4, y: 4}
+  rowsByColumns: {x: 10, y: 10}
   tileSize: {x: 2, y: 2}
   kernelCurve:
     serializedVersion: 2

@@ -62,6 +62,9 @@ public class MeshGeneration : MonoBehaviour
     [SerializeField] private bool showTriangulation = true;
     [SerializeField] private bool delauneyMesh = false;
 
+    [Header("Mesh Generation")]
+    [SerializeField] private MeshFilter meshFilter;
+
     [Header("Terrain Type Settings")]
     [SerializeField] private TerrainSetting waterSetting;
     [SerializeField] private TerrainSetting shoreSetting;
@@ -154,8 +157,9 @@ public class MeshGeneration : MonoBehaviour
 
     private void GenerateMeshVoronoi()
     {
-        List<MeshInformation> meshPolys = new List<MeshInformation>();
-        
+        // List<MeshInformation> meshPolys = new List<MeshInformation>();
+        TerrainMeshInformation terrain = new TerrainMeshInformation();
+
         if (_voronoi != null)
         {
             for (int i = 0; i < genData.length; i++)
@@ -167,8 +171,8 @@ public class MeshGeneration : MonoBehaviour
                 // var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
                 List<Vector2> polygonForSite = _voronoi.Region(curLocation);
 
-                Debug.LogErrorFormat("Site at ({0}, {1}) of type {2}", 
-                    curLocation.x, curLocation.y, curType);
+                //Debug.LogErrorFormat("Site at ({0}, {1}) of type {2}", 
+                //    curLocation.x, curLocation.y, curType);
 
                 // todo: figure out if we need additional line segments if the area is bound by the bounding box
                 // as opposed to other line segments
@@ -177,9 +181,18 @@ public class MeshGeneration : MonoBehaviour
                 //    Debug.LogErrorFormat("    Vertex posn {0}", polygonForSite[j]);
                 //}
                 MeshInformation newInfo = new MeshInformation(polygonForSite, yVal);
-                meshPolys.Add(newInfo);
+                // Debug.LogErrorFormat("Verts: {0}", newInfo.vertices);
+                // Debug.LogErrorFormat("Indexes: {0}", newInfo.triangles);
+                
+                // meshPolys.Add(newInfo);
+                terrain.AddMeshInfo(newInfo);
             }
         }
+
+        var generatedMesh = new Mesh() { name = "Procedural Mesh" };
+        meshFilter.mesh = generatedMesh;
+        generatedMesh.vertices = terrain.vertices;
+        generatedMesh.triangles = terrain.triangles;
     }
 
     private void GenerateMeshDelauney()
