@@ -79,64 +79,60 @@ public class MeshGeneration : MonoBehaviour
     private List<LineSegment> _triangulation = null;
     private Delaunay.Voronoi _voronoi;
 
-    private void OnDrawGizmos()
-    {
-        if (wasInit)
-        {
-            Gizmos.color = Color.magenta;
+    // Commenting this out because it's expensive - can comment back in if more debug is needed
+    //private void OnDrawGizmos()
+    //{
+    //    if (wasInit)
+    //    {
+    //        Gizmos.color = Color.magenta;
 
-            float offsetX = genData._lenX;
-            float offsetY = genData._lenY;
+    //        float offsetX = genData._lenX;
+    //        float offsetY = genData._lenY;
 
-            Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX/2f, 
-                genData._origin.y, genData._origin.z - offsetY / 2f);
+    //        Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX/2f, 
+    //            genData._origin.y, genData._origin.z - offsetY / 2f);
 
-            Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, offsetY), lowerLeft);
-            Vector3 upperRight = ProjectToXZPlane(new Vector2(offsetX, offsetY), lowerLeft);
-            Vector3 lowerRight = ProjectToXZPlane(new Vector2(offsetX, 0), lowerLeft);
+    //        Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, offsetY), lowerLeft);
+    //        Vector3 upperRight = ProjectToXZPlane(new Vector2(offsetX, offsetY), lowerLeft);
+    //        Vector3 lowerRight = ProjectToXZPlane(new Vector2(offsetX, 0), lowerLeft);
 
-            Gizmos.DrawLine(lowerLeft, upperLeft);
-            Gizmos.DrawLine(upperLeft, upperRight);
-            Gizmos.DrawLine(upperRight, lowerRight);
-            Gizmos.DrawLine(lowerRight, lowerLeft);
+    //        Gizmos.DrawLine(lowerLeft, upperLeft);
+    //        Gizmos.DrawLine(upperLeft, upperRight);
+    //        Gizmos.DrawLine(upperRight, lowerRight);
+    //        Gizmos.DrawLine(lowerRight, lowerLeft);
 
-            if (_voronoiEdges != null)
-            {
+    //        if (_voronoiEdges != null)
+    //        {
                 
-                Gizmos.color = Color.white;
-                for (int i = 0; i < _voronoiEdges.Count; i++)
-                {
-                    var left3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p0, lowerLeft);
-                    var right3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p1, lowerLeft);
-                    Gizmos.DrawLine(left3D, right3D);
-                }
-            }
+    //            Gizmos.color = Color.white;
+    //            for (int i = 0; i < _voronoiEdges.Count; i++)
+    //            {
+    //                var left3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p0, lowerLeft);
+    //                var right3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p1, lowerLeft);
+    //                Gizmos.DrawLine(left3D, right3D);
+    //            }
+    //        }
 
-            if (_triangulation != null && showTriangulation)
-            {
-                Gizmos.color = Color.green;
-                for (int i = 0; i < _triangulation.Count; i++)
-                {
-                    var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
-                    var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
-                    Gizmos.DrawLine(left3D, right3D);
-                }
-            }
+    //        if (_triangulation != null && showTriangulation)
+    //        {
+    //            Gizmos.color = Color.green;
+    //            for (int i = 0; i < _triangulation.Count; i++)
+    //            {
+    //                var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
+    //                var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
+    //                Gizmos.DrawLine(left3D, right3D);
+    //            }
+    //        }
 
-            //Gizmos.color = Color.magenta;
+    //        Gizmos.color = Color.magenta;
 
-            //foreach (var posn in genData.pointLocs)
-            //{
-            //    var posn3D = ProjectToXZPlane(posn, lowerLeft);
-            //    Gizmos.DrawSphere(posn3D, 0.05f);
-            //}
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-
-    }
+    //        foreach (var posn in genData.pointLocs)
+    //        {
+    //            var posn3D = ProjectToXZPlane(posn, lowerLeft);
+    //            Gizmos.DrawSphere(posn3D, 0.05f);
+    //        }
+    //    }
+    //}
 
     public void Init(GenerationData data)
     {
@@ -147,6 +143,7 @@ public class MeshGeneration : MonoBehaviour
 
         _voronoi = new Delaunay.Voronoi(genData.pointLocs, null, genData.rect);
         _voronoiEdges = _voronoi.VoronoiDiagram();
+
         // not currently needed
         // _triangulation = _voronoi.DelaunayTriangulation();
 
@@ -160,31 +157,28 @@ public class MeshGeneration : MonoBehaviour
         // List<MeshInformation> meshPolys = new List<MeshInformation>();
         TerrainMeshInformation terrain = new TerrainMeshInformation();
 
+        float offsetX = genData._lenX;
+        float offsetY = genData._lenY;
+        Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX / 2f,
+                genData._origin.y, genData._origin.z - offsetY / 2f);
+
         if (_voronoi != null)
         {
             for (int i = 0; i < genData.length; i++)
             {
                 TerrainType curType = genData.terrain1D[i];
-                float yVal = Setting(curType).GetYValue();
+                float yOffset = Setting(curType).GetYValue();
                 Vector2 curLocation = genData.pointLocs[i];
 
                 // var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
                 List<Vector2> polygonForSite = _voronoi.Region(curLocation);
 
-                //Debug.LogErrorFormat("Site at ({0}, {1}) of type {2}", 
-                //    curLocation.x, curLocation.y, curType);
+                // voronoi.region returns points in counterclockwise order, need clockwise order for meshes
+                // is there a less stupid way to do this?
+                polygonForSite.Reverse();
 
-                // todo: figure out if we need additional line segments if the area is bound by the bounding box
-                // as opposed to other line segments
-                //for (int j = 0; j < polygonForSite.Count; j++)
-                //{
-                //    Debug.LogErrorFormat("    Vertex posn {0}", polygonForSite[j]);
-                //}
-                MeshInformation newInfo = new MeshInformation(polygonForSite, yVal);
-                // Debug.LogErrorFormat("Verts: {0}", newInfo.vertices);
-                // Debug.LogErrorFormat("Indexes: {0}", newInfo.triangles);
+                MeshInformation newInfo = new MeshInformation(polygonForSite, yOffset, lowerLeft);
                 
-                // meshPolys.Add(newInfo);
                 terrain.AddMeshInfo(newInfo);
             }
         }

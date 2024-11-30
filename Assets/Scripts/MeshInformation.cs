@@ -28,27 +28,29 @@ public class MeshInformation
         get { return _vertices.Count; }
     }
 
-    public MeshInformation(List<Vector2> polygon, float yVal)
+    public MeshInformation(List<Vector2> polygon, float yOffset, Vector3 lowerLeftCorner)
     {
-        _vertices = To3D(polygon, yVal);
+        _vertices = To3D(polygon, yOffset, lowerLeftCorner);
         _triangles = TriangulatePoly(polygon.Count);
     }
 
-    private static List<Vector3> To3D(List<Vector2> points2D, float yVal)
+    private static List<Vector3> To3D(List<Vector2> points2D, float yVal, Vector3 lowerLeftCorner)
     {
         // list of 3d points to return
         List<Vector3> retPoints = new List<Vector3>();
 
         foreach (var point in points2D)
         {
-            retPoints.Add(new Vector3(point.x, yVal, point.y));
+            float x = lowerLeftCorner.x + point.x;
+            float y = lowerLeftCorner.y + yVal;
+            float z = lowerLeftCorner.z + point.y;
+            retPoints.Add(new Vector3(x, y, z));
         }
 
         return retPoints;
     }
 
     // given a count of vertices, return a triangulation that properly shares vertices among triangles.
-    // TODO: Test this
     private static List<int> TriangulatePoly(int count)
     {
         var ret = new List<int>();
@@ -58,10 +60,6 @@ public class MeshInformation
             Debug.LogError("Trying to triangulate with fewer than 3 points. Returning null");
             return ret;
         }
-
-        //ret.Add(0);
-        //ret.Add(1);
-        //ret.Add(2);
 
         for (int i = 2; i < count; i++)
         {
