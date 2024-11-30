@@ -4,19 +4,12 @@ using UnityEngine;
 
 public class GeneratorUI : MonoBehaviour
 {
-    private TileGeneration generatorInstance;
-    
-    #region Unity Callbacks
-    private void Start()
-    {
-        generatorInstance = TileGeneration.instance;
-    }
-    #endregion // Unity Callbacks
+    [SerializeField] private MeshGeneration meshGenerator;
 
     #region Public Facing Methods
     public void OnClickGenerateTerrain()
     {
-        generatorInstance.StartGeneration();
+        meshGenerator.StartGeneration();
     }
     #endregion // Public Facing Methods 
 }
