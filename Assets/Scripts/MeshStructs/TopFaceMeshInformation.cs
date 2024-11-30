@@ -7,7 +7,7 @@ using UnityEngine;
  * Stores the information for a single face of the terrain map. A list of these should be passed
  * along to TerrainMeshInformation which will conglomerate it and then pass it to a mesh.
  */ 
-public class MeshInformation
+public class TopFaceMeshInformation
 {
     // storing vertices, tris, etc, as lists privately, so I can easily add to them.
     // publicly exposed getters use 1D arrays because this is what the mesh needs.
@@ -23,15 +23,25 @@ public class MeshInformation
         get { return _triangles.ToArray(); }
     }
 
-    public int vertexCount
+    private List<Color> _colors = new List<Color>();
+    public Color[] colors
     {
-        get { return _vertices.Count; }
+        get { return _colors.ToArray(); }
     }
 
-    public MeshInformation(List<Vector2> polygon, float yOffset, Vector3 lowerLeftCorner)
+    private int _vertexCount = 0;
+    public int vertexCount
+    {
+        get { return _vertexCount; }
+    }
+
+    public TopFaceMeshInformation(List<Vector2> polygon, float yOffset, Color vertexColor, Vector3 lowerLeftCorner)
     {
         _vertices = To3D(polygon, yOffset, lowerLeftCorner);
-        _triangles = TriangulatePoly(polygon.Count);
+        _vertexCount = polygon.Count;
+        _triangles = TriangulatePoly(vertexCount);
+        _colors = PopulateColorArray(vertexColor, vertexCount);
+        // Debug.LogErrorFormat("My color is {0}, {1}, {2}", vertexColor.r, vertexColor.g, vertexColor.b);
     }
 
     private static List<Vector3> To3D(List<Vector2> points2D, float yVal, Vector3 lowerLeftCorner)
@@ -67,6 +77,16 @@ public class MeshInformation
             ret.Add(i - 1);
             ret.Add(i);
         }
+
+        return ret;
+    }
+
+    private static List<Color> PopulateColorArray(Color c, int count)
+    {
+        var ret = new List<Color>();
+
+        for (int i = 0; i < count; i++)
+            ret.Add(c);
 
         return ret;
     }

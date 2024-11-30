@@ -166,6 +166,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
             {
                 TerrainType curType = terrainTypes[i];
                 float yOffset = Setting(curType).GetYValue();
+                Color color = Setting(curType).GetColor();
                 Vector2 curLocation = points2D[i];
 
                 List<Vector2> polygonForSite = _voronoi.Region(curLocation);
@@ -174,9 +175,9 @@ public class VoronoiMeshGeneration : MonoBehaviour
                 // is there a less stupid way to do this?
                 polygonForSite.Reverse();
 
-                MeshInformation newInfo = new MeshInformation(polygonForSite, yOffset, lowerLeftCorner);
+                TopFaceMeshInformation newInfo = new TopFaceMeshInformation(polygonForSite, yOffset, color, lowerLeftCorner);
                 
-                terrain.AddMeshInfo(newInfo);
+                terrain.AddTopFaceMeshInfo(newInfo);
             }
         }
 
@@ -184,6 +185,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
         meshFilter.mesh = generatedMesh;
         generatedMesh.vertices = terrain.vertices;
         generatedMesh.triangles = terrain.triangles;
+        generatedMesh.SetColors(terrain.colors);
     }
 
     private void GenerateMeshDelauney()
