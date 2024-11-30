@@ -48,6 +48,7 @@ MonoBehaviour:
   showTriangulation: 0
   delauneyMesh: 0
   meshFilter: {fileID: 1311255484352755318}
+  meshOrigin: {x: 0, y: 0, z: -1}
   waterSetting:
     type: 0
     yValue: -1

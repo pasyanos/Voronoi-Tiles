@@ -146,9 +146,10 @@ public class TileGeneration : MonoBehaviour
 
         var posnOffsets2D = Generate2DOffsets(rowsByColumns, _generatedTileTypes);
 
-        meshGeneratorInstance.Init(
-            new MeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
-            tileSize, _generatedTileTypes, posnOffsets2D));
+        //meshGeneratorInstance.Init(
+        //    new MeshGeneration.GenerationData(tileParent.transform.position, rowsByColumns, 
+        //    tileSize, _generatedTileTypes, posnOffsets2D));
+        meshGeneratorInstance.Init(rowsByColumns, tileSize, _generatedTileTypes, posnOffsets2D);
 
         // commenting this out to begin generating my own mesh
         // InstantiateAssets();

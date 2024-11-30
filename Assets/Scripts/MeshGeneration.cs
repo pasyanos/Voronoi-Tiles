@@ -7,63 +7,13 @@ using Unity.Properties;
 
 public class MeshGeneration : MonoBehaviour
 {
-    public class GenerationData
-    {
-        public Vector3 _origin;
-        public Vector2Int _dimensions;
-        public Vector2 _tileSize;
-        public int length;
-
-        // these are used by the rectangle class for generation
-        public float _lenX;
-        public float _lenY;
-   
-        public List<Vector2> pointLocs;
-        public List<TerrainType> terrain1D;
-        public Rect rect;
-
-        public GenerationData(Vector3 origin, Vector2Int dimensions, Vector2 tileSize, 
-            TerrainType[,] terrainTypes, Vector2[,] posnOffsets)
-        {
-            _origin = origin;
-            _dimensions = dimensions;
-            _tileSize = tileSize;
-            
-            // adding on to the dimensions gives just a bit of wiggle room
-            _lenX = (dimensions.x + 1) * tileSize.x;
-            _lenY = (dimensions.y + 1) * tileSize.y;
-
-            // points2D = new Vector2[dimensions.x, dimensions.y];
-            pointLocs = new List<Vector2>();
-            terrain1D = new List<TerrainType>();
-
-            rect = new Rect(0, 0, _lenX, _lenY);
-
-            Vector2 startingPt = new Vector2(_tileSize.x*0.75f, _tileSize.y*0.75f);
-            Vector2 thisOffset;
-
-            // translate offsets to 2D positions
-            for (int i = 0; i < _dimensions.x; ++i)
-            {
-                for (int j = 0; j < _dimensions.y; ++j)
-                {
-                    thisOffset = new Vector2(i * tileSize.x, j * tileSize.y);
-                    // points2D[i, j] = startingPt + thisOffset + posnOffsets[i, j];
-                    pointLocs.Add(startingPt + thisOffset + posnOffsets[i, j]);
-                    terrain1D.Add(terrainTypes[i, j]);
-                }
-            }
-
-            length = pointLocs.Count;
-        }
-    }
-
     [Header("Debug Stuff")]
     [SerializeField] private bool showTriangulation = true;
     [SerializeField] private bool delauneyMesh = false;
 
     [Header("Mesh Generation")]
     [SerializeField] private MeshFilter meshFilter;
+    [SerializeField] private Vector3 meshOrigin = Vector3.zero;
 
     [Header("Terrain Type Settings")]
     [SerializeField] private TerrainSetting waterSetting;
@@ -74,7 +24,18 @@ public class MeshGeneration : MonoBehaviour
 
     // Runtime vars
     private bool wasInit = false;
-    private GenerationData genData;
+    // private GenerationData genData;
+
+    // information for generation 
+    private List<Vector2> points2D;
+    private List<TerrainType> terrainTypes;
+
+    // the 3D point of the lower left corner of the voronoi diagram
+    // this is used to convert 2D diagram points to 3D points in worldspace
+    private Vector3 lowerLeftCorner;
+    private Rect bounds;
+    private int numPoints;
+
     private List<LineSegment> _voronoiEdges = null;
     private List<LineSegment> _triangulation = null;
     private Delaunay.Voronoi _voronoi;
@@ -86,65 +47,83 @@ public class MeshGeneration : MonoBehaviour
     //    {
     //        Gizmos.color = Color.magenta;
 
-    //        float offsetX = genData._lenX;
-    //        float offsetY = genData._lenY;
+    //        Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, bounds.y), lowerLeftCorner);
+    //        Vector3 upperRight = ProjectToXZPlane(new Vector2(bounds.x, bounds.y), lowerLeftCorner);
+    //        Vector3 lowerRight = ProjectToXZPlane(new Vector2(bounds.x, 0), lowerLeftCorner);
 
-    //        Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX/2f, 
-    //            genData._origin.y, genData._origin.z - offsetY / 2f);
-
-    //        Vector3 upperLeft = ProjectToXZPlane(new Vector2(0, offsetY), lowerLeft);
-    //        Vector3 upperRight = ProjectToXZPlane(new Vector2(offsetX, offsetY), lowerLeft);
-    //        Vector3 lowerRight = ProjectToXZPlane(new Vector2(offsetX, 0), lowerLeft);
-
-    //        Gizmos.DrawLine(lowerLeft, upperLeft);
+    //        Gizmos.DrawLine(lowerLeftCorner, upperLeft);
     //        Gizmos.DrawLine(upperLeft, upperRight);
     //        Gizmos.DrawLine(upperRight, lowerRight);
-    //        Gizmos.DrawLine(lowerRight, lowerLeft);
+    //        Gizmos.DrawLine(lowerRight, lowerLeftCorner);
 
     //        if (_voronoiEdges != null)
     //        {
-                
     //            Gizmos.color = Color.white;
+
     //            for (int i = 0; i < _voronoiEdges.Count; i++)
     //            {
-    //                var left3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p0, lowerLeft);
-    //                var right3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p1, lowerLeft);
+    //                var left3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p0, lowerLeftCorner);
+    //                var right3D = ProjectToXZPlane((Vector2)_voronoiEdges[i].p1, lowerLeftCorner);
     //                Gizmos.DrawLine(left3D, right3D);
     //            }
     //        }
 
-    //        if (_triangulation != null && showTriangulation)
-    //        {
-    //            Gizmos.color = Color.green;
-    //            for (int i = 0; i < _triangulation.Count; i++)
-    //            {
-    //                var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
-    //                var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
-    //                Gizmos.DrawLine(left3D, right3D);
-    //            }
-    //        }
+    //        //if (_triangulation != null && showTriangulation)
+    //        //{
+    //        //    Gizmos.color = Color.green;
+    //        //    for (int i = 0; i < _triangulation.Count; i++)
+    //        //    {
+    //        //        var left3D = ProjectToXZPlane((Vector2)_triangulation[i].p0, lowerLeft);
+    //        //        var right3D = ProjectToXZPlane((Vector2)_triangulation[i].p1, lowerLeft);
+    //        //        Gizmos.DrawLine(left3D, right3D);
+    //        //    }
+    //        //}
 
     //        Gizmos.color = Color.magenta;
 
-    //        foreach (var posn in genData.pointLocs)
+    //        foreach (var posn in points2D)
     //        {
-    //            var posn3D = ProjectToXZPlane(posn, lowerLeft);
+    //            var posn3D = ProjectToXZPlane(posn, lowerLeftCorner);
     //            Gizmos.DrawSphere(posn3D, 0.05f);
     //        }
     //    }
     //}
 
-    public void Init(GenerationData data)
+    public void Init(Vector2Int gridDimensions, Vector2 tileSize, TerrainType[,] terrainGrid, Vector2[,] posnOffsets)
     {
-        // un-initialize
         wasInit = false;
 
-        genData = data;
+        // genData = data;
+        float lenX = (gridDimensions.x + 1) * tileSize.x;
+        float lenY = (gridDimensions.y + 1) * tileSize.y;
+        bounds = new Rect(0, 0, lenX, lenY);
 
-        _voronoi = new Delaunay.Voronoi(genData.pointLocs, null, genData.rect);
+        lowerLeftCorner = new Vector3(meshOrigin.x - lenX * 0.5f, meshOrigin.y, meshOrigin.z - lenY * 0.5f);
+
+        // translate 2D arrays to lists
+        points2D = new List<Vector2>();
+        terrainTypes = new List<TerrainType>();
+
+        Vector2 startingPt = new Vector2(tileSize.x * 0.5f, tileSize.y * 0.5f);
+        Vector2 thisOffset;
+
+        for (int i = 0; i < gridDimensions.x; i++)
+        {
+            for (int j = 0; j < gridDimensions.y; j++)
+            {
+                thisOffset = new Vector2(i * tileSize.x, j * tileSize.y);
+
+                points2D.Add(startingPt + thisOffset + posnOffsets[i, j]);
+                terrainTypes.Add(terrainGrid[i, j]);
+            }
+        }
+
+        numPoints = points2D.Count;
+
+        _voronoi = new Delaunay.Voronoi(points2D, null, bounds);
         _voronoiEdges = _voronoi.VoronoiDiagram();
 
-        // not currently needed
+        // This is not currently needed
         // _triangulation = _voronoi.DelaunayTriangulation();
 
         GenerateMeshVoronoi();
@@ -154,30 +133,23 @@ public class MeshGeneration : MonoBehaviour
 
     private void GenerateMeshVoronoi()
     {
-        // List<MeshInformation> meshPolys = new List<MeshInformation>();
         TerrainMeshInformation terrain = new TerrainMeshInformation();
-
-        float offsetX = genData._lenX;
-        float offsetY = genData._lenY;
-        Vector3 lowerLeft = new Vector3(genData._origin.x - offsetX / 2f,
-                genData._origin.y, genData._origin.z - offsetY / 2f);
 
         if (_voronoi != null)
         {
-            for (int i = 0; i < genData.length; i++)
+            for (int i = 0; i < numPoints; i++)
             {
-                TerrainType curType = genData.terrain1D[i];
+                TerrainType curType = terrainTypes[i];
                 float yOffset = Setting(curType).GetYValue();
-                Vector2 curLocation = genData.pointLocs[i];
+                Vector2 curLocation = points2D[i];
 
-                // var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
                 List<Vector2> polygonForSite = _voronoi.Region(curLocation);
 
                 // voronoi.region returns points in counterclockwise order, need clockwise order for meshes
                 // is there a less stupid way to do this?
                 polygonForSite.Reverse();
 
-                MeshInformation newInfo = new MeshInformation(polygonForSite, yOffset, lowerLeft);
+                MeshInformation newInfo = new MeshInformation(polygonForSite, yOffset, lowerLeftCorner);
                 
                 terrain.AddMeshInfo(newInfo);
             }
@@ -195,6 +167,7 @@ public class MeshGeneration : MonoBehaviour
     }
 
     #region Misc Helpers
+    // This is used by the gizmos function
     private static Vector3 ProjectToXZPlane(Vector2 rectPosn, Vector3 lowerLeftPoint)
     {
         float x = lowerLeftPoint.x + rectPosn.x;
@@ -202,8 +175,6 @@ public class MeshGeneration : MonoBehaviour
         float z = lowerLeftPoint.z + rectPosn.y;
         return new Vector3(x, y, z);
     }
-
-
 
     private TerrainSetting Setting(TerrainType tType)
     {
