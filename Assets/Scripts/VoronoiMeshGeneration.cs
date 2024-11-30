@@ -4,7 +4,7 @@ using UnityEngine;
 using Delaunay.Geo;
 
 
-public class MeshGeneration : MonoBehaviour
+public class VoronoiMeshGeneration : MonoBehaviour
 {
     //[Header("Debug Stuff")]
     //[SerializeField] private bool showTriangulation = true;

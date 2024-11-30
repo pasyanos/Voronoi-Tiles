@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GeneratorUI : MonoBehaviour
+public class VoronoiMeshUI : MonoBehaviour
 {
-    [SerializeField] private MeshGeneration meshGenerator;
+    [SerializeField] private VoronoiMeshGeneration meshGenerator;
 
     #region Public Facing Methods
     public void OnClickGenerateTerrain()
