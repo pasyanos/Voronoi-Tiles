@@ -154,19 +154,30 @@ public class MeshGeneration : MonoBehaviour
 
     private void GenerateMeshVoronoi()
     {
+        List<MeshInformation> meshPolys = new List<MeshInformation>();
+        
         if (_voronoi != null)
         {
             for (int i = 0; i < genData.length; i++)
             {
                 TerrainType curType = genData.terrain1D[i];
+                float yVal = Setting(curType).GetYValue();
                 Vector2 curLocation = genData.pointLocs[i];
 
-                var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
-                Debug.LogErrorFormat("Site at ({0}, {1}) has {2} line segments", 
-                    curLocation.x, curLocation.y, voronoiSiteInfo.Count);
+                // var voronoiSiteInfo = _voronoi.VoronoiBoundaryForSite(curLocation);
+                List<Vector2> polygonForSite = _voronoi.Region(curLocation);
+
+                Debug.LogErrorFormat("Site at ({0}, {1}) of type {2}", 
+                    curLocation.x, curLocation.y, curType);
 
                 // todo: figure out if we need additional line segments if the area is bound by the bounding box
                 // as opposed to other line segments
+                //for (int j = 0; j < polygonForSite.Count; j++)
+                //{
+                //    Debug.LogErrorFormat("    Vertex posn {0}", polygonForSite[j]);
+                //}
+                MeshInformation newInfo = new MeshInformation(polygonForSite, yVal);
+                meshPolys.Add(newInfo);
             }
         }
     }

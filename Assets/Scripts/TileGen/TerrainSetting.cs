@@ -9,4 +9,5 @@ public class TerrainSetting
     [SerializeField] private float yValue;
     [SerializeField] private Color color;
     public Color GetColor() { return color; }
+    public float GetYValue() { return yValue; }
 }
