@@ -56,6 +56,12 @@ public class VoronoiMeshGeneration : MonoBehaviour
     private List<LineSegment> _triangulation = null;
     private Delaunay.Voronoi _voronoi;
 
+    private void Start()
+    {
+        // generate a new mesh on start
+        StartGeneration();
+    }
+
     // Commenting this out because it's expensive - can comment back in if more debug is needed
     //private void OnDrawGizmos()
     //{
@@ -107,8 +113,6 @@ public class VoronoiMeshGeneration : MonoBehaviour
 
     public void StartGeneration()
     {
-        // ClearPrevGeneration();
-        // _instantiatedTiles.Clear();
         GenerateKernel();
 
         InstantiateTiles();
