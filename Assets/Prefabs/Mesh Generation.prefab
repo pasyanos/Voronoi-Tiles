@@ -65,8 +65,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -79,7 +79,7 @@ MonoBehaviour:
   waterSetting:
     type: 0
     yValue: -1
-    color: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 1}
+    color: {r: 0, g: 0.14933838, b: 0.31132078, a: 1}
   shoreSetting:
     type: 1
     yValue: 0.25

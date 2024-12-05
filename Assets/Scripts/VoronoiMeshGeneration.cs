@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Delaunay.Geo;
+using System.Linq;
 
 
 public class VoronoiMeshGeneration : MonoBehaviour
@@ -29,8 +30,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
     [SerializeField] private TerrainSetting highMountSetting;
 
     // Runtime vars
-    private bool wasInit = false;
-
+    // private bool wasInit = false;
     // information for generation 
     // Runtime Vars
     private TerrainType[,] _generatedTileTypes;
@@ -52,10 +52,12 @@ public class VoronoiMeshGeneration : MonoBehaviour
     private Rect bounds;
     private int numPoints;
 
-    private List<LineSegment> _voronoiEdges = null;
-    private List<LineSegment> _triangulation = null;
+    // private List<LineSegment> _voronoiEdges = null;
+    // Not used
+    // private List<LineSegment> _triangulation = null;
     private Delaunay.Voronoi _voronoi;
 
+    #region Unity Callbacks
     private void Start()
     {
         // generate a new mesh on start
@@ -110,17 +112,21 @@ public class VoronoiMeshGeneration : MonoBehaviour
     //        }
     //    }
     //}
+    #endregion // Unity Callbacks
 
+    #region Public Facing Methods
     public void StartGeneration()
     {
         GenerateKernel();
 
         InstantiateTiles();
     }
+    #endregion // Public Facing Methods
 
-    public void Init(Vector2Int gridDimensions, Vector2 tileSize, TerrainType[,] terrainGrid, Vector2[,] posnOffsets)
+    #region Mesh Generation Functions
+    private void Init(Vector2Int gridDimensions, Vector2 tileSize, TerrainType[,] terrainGrid, Vector2[,] posnOffsets)
     {
-        wasInit = false;
+        // wasInit = false;
 
         // genData = data;
         float lenX = (gridDimensions.x + 1) * tileSize.x;
@@ -150,14 +156,12 @@ public class VoronoiMeshGeneration : MonoBehaviour
         numPoints = points2D.Count;
 
         _voronoi = new Delaunay.Voronoi(points2D, null, bounds);
-        _voronoiEdges = _voronoi.VoronoiDiagram();
+        // _voronoiEdges = _voronoi.VoronoiDiagram();
 
         // This is not currently needed
         // _triangulation = _voronoi.DelaunayTriangulation();
 
         GenerateMeshVoronoi();
-
-        wasInit = true;
     }
 
     private void GenerateMeshVoronoi()
@@ -173,15 +177,42 @@ public class VoronoiMeshGeneration : MonoBehaviour
                 Color color = Setting(curType).GetColor();
                 Vector2 curLocation = points2D[i];
 
-                List<Vector2> polygonForSite = _voronoi.Region(curLocation);
+                //List<Vector2> polygonForSite = _voronoi.Region(curLocation);
 
-                // voronoi.region returns points in counterclockwise order, need clockwise order for meshes
-                // is there a less stupid way to do this?
-                polygonForSite.Reverse();
+                //// voronoi.region returns points in counterclockwise order, need clockwise order for meshes
+                //// is there a less stupid way to do this?
+                //polygonForSite.Reverse();
+                List<Vector2> polygonForSite = SortClockwise(_voronoi.Region(curLocation), curLocation);
 
-                TopFaceMeshInformation newInfo = new TopFaceMeshInformation(polygonForSite, yOffset, color, lowerLeftCorner);
+                TopFaceMeshInformation newInfo = new TopFaceMeshInformation(polygonForSite, yOffset, color, 
+                    lowerLeftCorner);
                 
                 terrain.AddTopFaceMeshInfo(newInfo);
+
+                // find neighbors and form walls where needed
+                List<Vector2> neighbors = _voronoi.NeighborSitesForSite(curLocation);
+                // string debugStr = string.Format("Neigbor sites of {0}: ", curLocation);
+
+                foreach (var neighbor in neighbors)
+                {
+                    // debugStr += string.Format(" {0} ", neighbor);
+
+                    // is there a better way to do this?
+                    int neighborIndex = points2D.IndexOf(neighbor);
+                    TerrainType neighborTerrainType = terrainTypes[neighborIndex];
+
+                    // "taller" tiles will form the walls for their shorter neighbors
+                    // if we don't need to make a wall, we can avoid some expensive calculations
+                    if (neighborTerrainType < curType)
+                    {
+                        // Debug.LogErrorFormat("neighbor of {0} site is a {1} site", curType, neighborTerrainType);
+                        List<Vector2> neighborPolygon = _voronoi.Region(neighbor);
+                        // again, need this in reverse order
+                        neighborPolygon.Reverse();
+                    }
+                }
+
+                // Debug.LogError(debugStr);
             }
         }
 
@@ -191,11 +222,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
         generatedMesh.triangles = terrain.triangles;
         generatedMesh.SetColors(terrain.colors);
     }
-
-    private void GenerateMeshDelauney()
-    {
-        // todo:
-    }
+    #endregion // mesh generation functions
 
     #region Misc Helpers
     // This is used by the gizmos function
@@ -222,6 +249,13 @@ public class VoronoiMeshGeneration : MonoBehaviour
             default:
                 return waterSetting;
         }
+    }
+
+    private static List<Vector2> SortClockwise(List<Vector2> points, Vector2 center)
+    {
+        // todo:
+        // return points;
+        return points.OrderByDescending(p => System.Math.Atan2(p.y - center.y, p.x - center.x)).ToList();
     }
 
     private void InstantiateTiles()
