@@ -38,8 +38,6 @@ public class TerrainMeshInformation
 
     public void AddTopFaceMeshInfo(TopFaceMeshInformation meshInfo)
     {
-        // first, add all new verts to vertex list
-        Vector3[] newVerts = meshInfo.vertices;
         int[] triIndices = meshInfo.triangles;
 
         _vertices.AddRange(meshInfo.vertices);
@@ -53,5 +51,21 @@ public class TerrainMeshInformation
 
         // finally, update the count
         _count += meshInfo.vertexCount;
+    }
+
+    public void AddWallMeshInfo(WallMeshInformation wallMeshInfo)
+    {
+        // Vector3[] newVerts = wallMeshInfo.vertices;
+        int[] triIndices = wallMeshInfo.triangles;
+
+        _vertices.AddRange(wallMeshInfo.vertices);
+        _colors.AddRange(wallMeshInfo.colors);
+
+        for (int i = 0; i < wallMeshInfo.triangles.Length; i++)
+        {
+            _triangles.Add(triIndices[i] + _count);
+        }
+
+        _count += wallMeshInfo.vertexCount;
     }
 }

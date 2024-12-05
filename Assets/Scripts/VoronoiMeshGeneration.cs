@@ -206,9 +206,26 @@ public class VoronoiMeshGeneration : MonoBehaviour
                     if (neighborTerrainType < curType)
                     {
                         // Debug.LogErrorFormat("neighbor of {0} site is a {1} site", curType, neighborTerrainType);
-                        List<Vector2> neighborPolygon = _voronoi.Region(neighbor);
-                        // again, need this in reverse order
-                        neighborPolygon.Reverse();
+                        List<Vector2> neighborPolygon = SortClockwise(_voronoi.Region(neighbor), neighbor);
+                        float lowY = Setting(neighborTerrainType).GetYValue();
+                        Color lowColor = Setting(neighborTerrainType).GetColor();
+
+                        Vector2 fromIndex = neighborPolygon.Last();
+                        for (int j = 0; j < neighborPolygon.Count; j++)
+                        {
+                            Vector2 toIndex = neighborPolygon[j];
+
+                            // line from fromIndex to toIndex
+                            if (polygonForSite.Contains(fromIndex) && polygonForSite.Contains(toIndex))
+                            {
+                                //Debug.LogError("Found a wall!");
+                                WallMeshInformation newWall = new WallMeshInformation(fromIndex, toIndex, 
+                                    yOffset, lowY, color, lowColor, lowerLeftCorner);
+                                terrain.AddWallMeshInfo(newWall);
+                            }
+
+                            fromIndex = toIndex;
+                        }
                     }
                 }
 
