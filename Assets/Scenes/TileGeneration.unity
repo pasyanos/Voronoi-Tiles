@@ -822,10 +822,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mesh Generation
       objectReference: {fileID: 0}
-    - target: {fileID: 7667926891907302552, guid: c0d080b4e4084d040811e26e352a7f07, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

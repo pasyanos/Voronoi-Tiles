@@ -39,10 +39,14 @@ public class WallMeshInformation
         Vector3 downTo = new Vector3(toPoint.x, bottomY, toPoint.y) + lowerLeftCorner;
         Vector3 downFrom = new Vector3(fromPt.x, bottomY, fromPt.y) + lowerLeftCorner;
 
-        _vertices.Add(upFrom);
+        //_vertices.Add(upFrom);
+        //_vertices.Add(upTo);
+        //_vertices.Add(downTo);
+        //_vertices.Add(downFrom);
         _vertices.Add(upTo);
-        _vertices.Add(downTo);
+        _vertices.Add(upFrom);
         _vertices.Add(downFrom);
+        _vertices.Add(downTo);
 
         _vertexCount = 4;
 

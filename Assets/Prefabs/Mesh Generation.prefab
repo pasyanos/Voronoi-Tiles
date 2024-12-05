@@ -76,6 +76,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   offsetEvenColumns: 1
   randomAmt: 0.5
+  wallColor: {r: 0.24528301, g: 0.2222601, b: 0.20247418, a: 1}
   waterSetting:
     type: 0
     yValue: -1

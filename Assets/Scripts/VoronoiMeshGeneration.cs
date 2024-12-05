@@ -7,10 +7,6 @@ using System.Linq;
 
 public class VoronoiMeshGeneration : MonoBehaviour
 {
-    //[Header("Debug Stuff")]
-    //[SerializeField] private bool showTriangulation = true;
-    //[SerializeField] private bool delauneyMesh = false;
-
     [Header("Mesh Generation")]
     [SerializeField] private MeshFilter meshFilter;
     [SerializeField] private Vector3 meshOrigin = Vector3.zero;
@@ -21,6 +17,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
     [SerializeField] private AnimationCurve kernelCurve;
     [SerializeField] private bool offsetEvenColumns = true;
     [SerializeField][Range(0f, 1f)] private float randomAmt = 0f;
+    [SerializeField] private Color wallColor = Color.gray;
 
     [Header("Terrain Type Settings")]
     [SerializeField] private TerrainSetting waterSetting;
@@ -29,9 +26,6 @@ public class VoronoiMeshGeneration : MonoBehaviour
     [SerializeField] private TerrainSetting lowMountSetting;
     [SerializeField] private TerrainSetting highMountSetting;
 
-    // Runtime vars
-    // private bool wasInit = false;
-    // information for generation 
     // Runtime Vars
     private TerrainType[,] _generatedTileTypes;
     private Vector3[,] _tileLocs;
@@ -167,69 +161,100 @@ public class VoronoiMeshGeneration : MonoBehaviour
     private void GenerateMeshVoronoi()
     {
         TerrainMeshInformation terrain = new TerrainMeshInformation();
+        float bottomWallY = meshOrigin.y - 0.1f;
 
         if (_voronoi != null)
         {
             for (int i = 0; i < numPoints; i++)
             {
                 TerrainType curType = terrainTypes[i];
-                float yOffset = Setting(curType).GetYValue();
-                Color color = Setting(curType).GetColor();
-                Vector2 curLocation = points2D[i];
 
-                //List<Vector2> polygonForSite = _voronoi.Region(curLocation);
-
-                //// voronoi.region returns points in counterclockwise order, need clockwise order for meshes
-                //// is there a less stupid way to do this?
-                //polygonForSite.Reverse();
-                List<Vector2> polygonForSite = SortClockwise(_voronoi.Region(curLocation), curLocation);
-
-                TopFaceMeshInformation newInfo = new TopFaceMeshInformation(polygonForSite, yOffset, color, 
-                    lowerLeftCorner);
-                
-                terrain.AddTopFaceMeshInfo(newInfo);
-
-                // find neighbors and form walls where needed
-                List<Vector2> neighbors = _voronoi.NeighborSitesForSite(curLocation);
-                // string debugStr = string.Format("Neigbor sites of {0}: ", curLocation);
-
-                foreach (var neighbor in neighbors)
+                // don't instantiate for water
+                if (curType > TerrainType.WATER)
                 {
-                    // debugStr += string.Format(" {0} ", neighbor);
+                    float yOffset = Setting(curType).GetYValue();
+                    Color color = Setting(curType).GetColor();
+                    Vector2 curLocation = points2D[i];
 
-                    // is there a better way to do this?
-                    int neighborIndex = points2D.IndexOf(neighbor);
-                    TerrainType neighborTerrainType = terrainTypes[neighborIndex];
+                    //List<Vector2> polygonForSite = _voronoi.Region(curLocation);
 
-                    // "taller" tiles will form the walls for their shorter neighbors
-                    // if we don't need to make a wall, we can avoid some expensive calculations
-                    if (neighborTerrainType < curType)
+                    //// voronoi.region returns points in counterclockwise order, need clockwise order for meshes
+                    //// is there a less stupid way to do this?
+                    //polygonForSite.Reverse();
+                    List<Vector2> polygonForSite = SortClockwise(_voronoi.Region(curLocation), curLocation);
+
+                    TopFaceMeshInformation newInfo = new TopFaceMeshInformation(polygonForSite, yOffset, color,
+                        lowerLeftCorner);
+
+                    terrain.AddTopFaceMeshInfo(newInfo);
+
+                    Vector2 from = polygonForSite[polygonForSite.Count - 1];
+
+                    for (int j = 0; j < polygonForSite.Count; j++)
                     {
-                        // Debug.LogErrorFormat("neighbor of {0} site is a {1} site", curType, neighborTerrainType);
-                        List<Vector2> neighborPolygon = SortClockwise(_voronoi.Region(neighbor), neighbor);
-                        float lowY = Setting(neighborTerrainType).GetYValue();
-                        Color lowColor = Setting(neighborTerrainType).GetColor();
+                        Vector2 to = polygonForSite[j];
 
-                        Vector2 fromIndex = neighborPolygon.Last();
-                        for (int j = 0; j < neighborPolygon.Count; j++)
-                        {
-                            Vector2 toIndex = neighborPolygon[j];
+                        WallMeshInformation newWall = new WallMeshInformation(from, to, yOffset, bottomWallY, 
+                            wallColor, wallColor, lowerLeftCorner);
+                        terrain.AddWallMeshInfo(newWall);
 
-                            // line from fromIndex to toIndex
-                            if (polygonForSite.Contains(fromIndex) && polygonForSite.Contains(toIndex))
-                            {
-                                //Debug.LogError("Found a wall!");
-                                WallMeshInformation newWall = new WallMeshInformation(fromIndex, toIndex, 
-                                    yOffset, lowY, color, lowColor, lowerLeftCorner);
-                                terrain.AddWallMeshInfo(newWall);
-                            }
-
-                            fromIndex = toIndex;
-                        }
+                        from = to;
                     }
-                }
 
-                // Debug.LogError(debugStr);
+                    // bug with this so just generating all walls for a tile
+                    // find neighbors and form walls where needed
+                    // List<Vector2> neighbors = _voronoi.NeighborSitesForSite(curLocation);
+
+                    //foreach (var neighbor in neighbors)
+                    //{
+                    //    // debugStr += string.Format(" {0} ", neighbor);
+
+                    //    // is there a better way to do this?
+                    //    int neighborIndex = points2D.IndexOf(neighbor);
+                    //    TerrainType neighborTerrainType = terrainTypes[neighborIndex];
+
+                    //    // "taller" tiles will form the walls for their shorter neighbors
+                    //    // if we don't need to make a wall, we can avoid some expensive calculations
+                    //    if (neighborTerrainType < curType)
+                    //    {
+                    //        List<Vector2> neighborPolygon = SortClockwise(_voronoi.Region(neighbor), neighbor);
+                    //        float lowY = Setting(neighborTerrainType).GetYValue();
+                    //        Color lowColor = Setting(neighborTerrainType).GetColor();
+
+                    //        //Vector2 fromIndex = neighborPolygon.Last();
+                    //        //for (int j = 0; j < neighborPolygon.Count; j++)
+                    //        //{
+                    //        //    Vector2 toIndex = neighborPolygon[j];
+
+                    //        //    // line from fromIndex to toIndex
+                    //        //    if (polygonForSite.Contains(fromIndex)) //&& polygonForSite.Contains(toIndex))
+                    //        //    {
+                    //        //        //Debug.LogError("Found a wall!");
+                    //        //        WallMeshInformation newWall = new WallMeshInformation(fromIndex, toIndex, 
+                    //        //            yOffset, lowY, color, lowColor, lowerLeftCorner);
+                    //        //        terrain.AddWallMeshInfo(newWall);
+                    //        //    }
+
+                    //        //    fromIndex = toIndex;
+                    //        //}
+                    //        Vector2 fromIndex = polygonForSite[polygonForSite.Count - 1];
+
+                    //        for (int j = 0; j < polygonForSite.Count; j++)
+                    //        {
+                    //            Vector2 toIndex = polygonForSite[j];
+
+                    //            if (neighborPolygon.Contains(fromIndex) && neighborPolygon.Contains(toIndex))
+                    //            {
+                    //                WallMeshInformation newWall = new WallMeshInformation(fromIndex, toIndex,
+                    //                    yOffset, lowY, color, lowColor, lowerLeftCorner);
+                    //                terrain.AddWallMeshInfo(newWall);
+                    //            }
+
+                    //            fromIndex = toIndex;
+                    //        }
+                    //    }
+                    //}
+                }
             }
         }
 
