@@ -10,6 +10,7 @@ Information needed to operate the playable demo will go here.
 
 - 10/27/24 - Basic tile generation with placeholder assets finalized. First Github pages build published.
 - 11/16/24 - Voronoi area generation added.
+- 12/4/2024 - Mesh generation using Voronoi areas. Build updated.
 
 ## Tools
 
