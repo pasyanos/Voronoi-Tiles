@@ -19,8 +19,10 @@ public class VoronoiMeshGeneration : MonoBehaviour
     [SerializeField] private AnimationCurve kernelCurve;
     [SerializeField] private bool _offsetEvenColumns = true;
     public bool offsetEvenColumns { get { return _offsetEvenColumns; } }
-    [SerializeField][Range(0f, 1f)] private float _randomizePointFactor = 0.2f;
+    [SerializeField][Range(0f, 0.5f)] private float _randomizePointFactor = 0.2f;
     public float randomizePointFactor { get { return _randomizePointFactor; } }
+    [SerializeField][Range(0f, 0.5f)] private float _likeNeighborsRelaxationAmt = 0.3f;
+
 
     [Space(10)]
     [SerializeField] private Color wallColor = Color.gray;
@@ -357,19 +359,42 @@ public class VoronoiMeshGeneration : MonoBehaviour
         float xOff = UnityEngine.Random.Range(0, 1);
         float yOff = UnityEngine.Random.Range(0, 1);
 
+        TerrainType currentType;
+        Vector2 posn;
+
         // init all to a zero vector
         for (int i = 0; i < size.x; ++i)
         {
             for (int j = 0; j < size.y; ++j)
             {
-                var posn = Vector2.zero;
+                currentType = types[i, j];
+                posn = Vector2.zero;
 
                 var columnOffset = _offsetEvenColumns ? new Vector2(0, (i % 2) * 0.5f) : Vector2.zero; // else
 
                 // todo: fancy mods to posn here
-                Vector2 rand = new Vector2(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f));
+                Vector2 rand = new Vector2(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f));
 
-                ret[i, j] = posn + _randomizePointFactor * rand + columnOffset;
+                Vector2 likeNeigborOffset = Vector2.zero;
+                TerrainType up = GetNorthType(i, j);
+                if (currentType == up)
+                    likeNeigborOffset += Vector2.up * 0.5f;
+
+                TerrainType down = GetSouthType(i, j);
+                if (currentType == down)
+                    likeNeigborOffset += Vector2.down * 0.5f;
+
+                TerrainType left = GetWestType(i, j);
+                if (currentType == left)
+                    likeNeigborOffset += Vector2.left * 0.5f;
+
+                TerrainType right = GetEastType(i, j);
+                if (currentType == right)
+                    likeNeigborOffset += Vector2.right * 0.5f;
+
+                ret[i, j] = posn + _randomizePointFactor * rand 
+                    + _likeNeighborsRelaxationAmt*likeNeigborOffset 
+                    + columnOffset;
             }
         }
 
@@ -448,6 +473,42 @@ public class VoronoiMeshGeneration : MonoBehaviour
         }
 
         return ret;
+    }
+
+    private TerrainType GetWestType(int i, int j)
+    {
+        if (i > 0)
+            return _generatedTileTypes[i - 1, j];
+
+        // if we are on the edge, just assume that the neighbor would be the same terrain type
+        return _generatedTileTypes[i, j];
+    }
+    
+    private TerrainType GetEastType(int i, int j)
+    {
+        if (i < _rowsByColumns.x - 1)
+            return _generatedTileTypes[i + 1, j];
+
+        // if we are on the edge, just assume that the neighbor would be the same terrain type
+        return _generatedTileTypes[i, j];
+    }
+
+    private TerrainType GetNorthType(int i, int j)
+    {
+        if (j > 0)
+            return _generatedTileTypes[i, j - 1];
+
+        // if we are on the edge, just assume that the neighbor would be the same terrain type
+        return _generatedTileTypes[i, j];
+    }
+
+    private TerrainType GetSouthType(int i, int j)
+    {
+        if (j < _rowsByColumns.y - 1)
+            return _generatedTileTypes[i, j + 1];
+        
+        // if we are on the edge, just assume that the neighbor would be the same terrain type
+        return _generatedTileTypes[i, j];
     }
     #endregion
 }

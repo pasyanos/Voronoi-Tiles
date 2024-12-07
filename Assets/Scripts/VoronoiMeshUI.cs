@@ -43,7 +43,7 @@ public class VoronoiMeshUI : MonoBehaviour
     #region private methods and helpers
     private void UpdateUI()
     {
-        // clear previous
+        // clear previous map
         foreach (Transform child in _gridTransform)
             Destroy(child.gameObject);
 

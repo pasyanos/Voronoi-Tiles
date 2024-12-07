@@ -49,7 +49,7 @@ MonoBehaviour:
   meshFilter: {fileID: 1311255484352755318}
   meshOrigin: {x: 0, y: 0, z: -1}
   _rowsByColumns: {x: 15, y: 15}
-  tileSize: {x: 1, y: 1}
+  _tileSize: {x: 1, y: 1}
   kernelCurve:
     serializedVersion: 2
     m_Curve:
@@ -74,8 +74,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  offsetEvenColumns: 1
-  randomAmt: 0.5
+  _offsetEvenColumns: 1
+  _randomizePointFactor: 0.25
+  _likeNeighborsRelaxationAmt: 0.35
   wallColor: {r: 0.24528301, g: 0.2222601, b: 0.20247418, a: 1}
   waterSetting:
     type: 0
