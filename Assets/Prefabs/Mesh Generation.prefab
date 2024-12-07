@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshFilter: {fileID: 1311255484352755318}
   meshOrigin: {x: 0, y: 0, z: -1}
-  rowsByColumns: {x: 15, y: 15}
+  _rowsByColumns: {x: 15, y: 15}
   tileSize: {x: 1, y: 1}
   kernelCurve:
     serializedVersion: 2
@@ -97,6 +97,9 @@ MonoBehaviour:
     type: 45
     yValue: 2
     color: {r: 0.3066038, g: 0.28031695, b: 0.2646627, a: 1}
+  mapUpdatedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7667926891907302552
 GameObject:
   m_ObjectHideFlags: 0
