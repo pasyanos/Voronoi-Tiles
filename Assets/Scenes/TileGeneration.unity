@@ -847,7 +847,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lookAtTarget: {fileID: 1302858860}
-  _cameraRotationRadius: 12
+  _cameraRotationRadius: 13
   _rotationSpeed: 1
 --- !u!1 &1660504486
 GameObject:
