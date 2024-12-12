@@ -39,6 +39,8 @@ public class VoronoiMeshUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _relaxationAmountText;
     [SerializeField] private Slider _relaxationAmountSlider;
 
+    private bool _showUI = true;
+
     private void Start()
     {
         meshGenerator.mapUpdatedEvent.AddListener(UpdateUI);
@@ -78,6 +80,15 @@ public class VoronoiMeshUI : MonoBehaviour
         SetRelaxationAmtText(neighborRelaxation);
 
         _tileMapGrid.cellSize = new Vector2(_tileHeight, _tileHeight);
+        SetHideableUI(_showUI);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ToggleUI();
+        }
     }
 
     private void OnDestroy()
@@ -204,6 +215,22 @@ public class VoronoiMeshUI : MonoBehaviour
     {
         int percent = Mathf.RoundToInt(100 * val);
         _relaxationAmountText.text = string.Format("Point Relax: {0}%", percent);
+    }
+
+    private void ToggleUI()
+    {
+        _showUI = !_showUI;
+        // Debug.LogError("Toggling UI");
+        SetHideableUI(_showUI);
+    }
+
+    private void SetHideableUI(bool show)
+    {
+        foreach (CanvasGroup elem in _toggleableCGList)
+        {
+            elem.interactable = show;
+            elem.alpha = show ? 1 : 0;
+        }
     }
     #endregion
 }
