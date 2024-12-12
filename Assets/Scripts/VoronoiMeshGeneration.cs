@@ -226,6 +226,33 @@ public class VoronoiMeshGeneration : MonoBehaviour
     }
     #endregion // mesh generation functions
 
+    #region UI Hooks
+    public void SetRowDimensions(int newRows)
+    {
+        _rowsByColumns.x = newRows;
+    }
+
+    public void SetColumnDimensions(int newColumns)
+    {
+        _rowsByColumns.y = newColumns;
+    }
+
+    public void SetTileSizeX(float newSizeX)
+    {
+        _tileSize.x = newSizeX;
+    }
+
+    public void SetTiileSizeY(float newSizeY)
+    {
+        _tileSize.y = newSizeY;
+    }
+
+    public void SetOffsetColumns(bool offset)
+    {
+        _offsetEvenColumns = offset;
+    }
+    #endregion
+
     #region Misc Helpers
     // This is used by the gizmos function
     private static Vector3 ProjectToXZPlane(Vector2 rectPosn, Vector3 lowerLeftPoint)
