@@ -25,10 +25,12 @@ public class VoronoiMeshUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _columnsSettingText;
     [SerializeField] private Slider _columnsSlider;
     [Space(10)]
-    [SerializeField] private TextMeshProUGUI _tileSizeXText;
-    [SerializeField] private Slider _sizeXSlider;
-    [SerializeField] private TextMeshProUGUI _tileSizeYText;
-    [SerializeField] private Slider _sizeYSlider;
+    //[SerializeField] private TextMeshProUGUI _tileSizeXText;
+    //[SerializeField] private Slider _sizeXSlider;
+    //[SerializeField] private TextMeshProUGUI _tileSizeYText;
+    //[SerializeField] private Slider _sizeYSlider;
+    [SerializeField] private TextMeshProUGUI _tileSizeText;
+    [SerializeField] private Slider _tileSizeSlider;
     [Space(10)]
     [SerializeField] private Toggle _offsetColumnToggle;
     [Space(10)]
@@ -54,11 +56,14 @@ public class VoronoiMeshUI : MonoBehaviour
         SetColumnTextUI(curDimensions.y);
         _columnsSlider.value = curDimensions.y;
 
-        var curTileSize = meshGenerator.tileSize;
-        SetSizeXUIText(curTileSize.x);
-        _sizeXSlider.value = curTileSize.x;
-        SetSizeYUIText(curTileSize.y);
-        _sizeYSlider.value = curTileSize.y;
+        var curTileSize = meshGenerator.tileSize.x;
+        meshGenerator.SetTileSize(curTileSize);
+        //SetSizeXUIText(curTileSize.x);
+        //_sizeXSlider.value = curTileSize.x;
+        //SetSizeYUIText(curTileSize.y);
+        //_sizeYSlider.value = curTileSize.y;
+        _tileSizeSlider.value = curTileSize;
+        SetTileSizeText(curTileSize);
 
         bool offsetCols = meshGenerator.offsetEvenColumns;
 
@@ -100,18 +105,25 @@ public class VoronoiMeshUI : MonoBehaviour
         meshGenerator.SetColumnDimensions((int)val);
     }
 
-    public void OnTileSizeXSliderUpdated()
-    {
-        float val = _sizeXSlider.value;
-        SetSizeXUIText(val);
-        meshGenerator.SetTileSizeX(val);
-    }
+    //public void OnTileSizeXSliderUpdated()
+    //{
+    //    float val = _sizeXSlider.value;
+    //    SetSizeXUIText(val);
+    //    meshGenerator.SetTileSizeX(val);
+    //}
 
-    public void OnTileSizeYSliderUpdated()
+    //public void OnTileSizeYSliderUpdated()
+    //{
+    //    float val = _sizeYSlider.value;
+    //    SetSizeYUIText(val);
+    //    meshGenerator.SetTiileSizeY(val);
+    //}
+
+    public void OnUpdateBothXYSize()
     {
-        float val = _sizeYSlider.value;
-        SetSizeYUIText(val);
-        meshGenerator.SetTiileSizeY(val);
+        float val = _tileSizeSlider.value;
+        SetTileSizeText(val);
+        meshGenerator.SetTileSize(val);
     }
 
     public void OnToggleOffsetColumns()
@@ -167,14 +179,19 @@ public class VoronoiMeshUI : MonoBehaviour
         _columnsSettingText.text = string.Format("Cols: {0}", val);
     }
 
-    private void SetSizeXUIText(float val)
-    {
-        _tileSizeXText.text = string.Format("X: {0:0.00}", val);
-    }
+    //private void SetSizeXUIText(float val)
+    //{
+    //    _tileSizeXText.text = string.Format("X: {0:0.00}", val);
+    //}
 
-    private void SetSizeYUIText(float val)
+    //private void SetSizeYUIText(float val)
+    //{
+    //    _tileSizeYText.text = string.Format("Y: {0:0.00}", val);
+    //}
+
+    private void SetTileSizeText(float val)
     {
-        _tileSizeYText.text = string.Format("Y: {0:0.00}", val);
+        _tileSizeText.text = string.Format("{0:0.00} x {0:0.00}", val);
     }
 
     private void SetPerlinAmtText(float val)

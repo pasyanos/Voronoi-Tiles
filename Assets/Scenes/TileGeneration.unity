@@ -387,10 +387,8 @@ MonoBehaviour:
   _rowsSlider: {fileID: 88414365}
   _columnsSettingText: {fileID: 534071011}
   _columnsSlider: {fileID: 1910739682}
-  _tileSizeXText: {fileID: 793467636}
-  _sizeXSlider: {fileID: 541845347}
-  _tileSizeYText: {fileID: 1127055355}
-  _sizeYSlider: {fileID: 1000659622}
+  _tileSizeText: {fileID: 793467636}
+  _tileSizeSlider: {fileID: 541845347}
   _offsetColumnToggle: {fileID: 772732327}
   _perlinAmountText: {fileID: 1061932762}
   _perlinAmountSlider: {fileID: 734930295}
@@ -789,8 +787,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1232952405}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1610,7 +1608,7 @@ GameObject:
   - component: {fileID: 541845346}
   - component: {fileID: 541845347}
   m_Layer: 5
-  m_Name: Size X Slider
+  m_Name: Size Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1635,8 +1633,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 32.5, y: 0}
-  m_SizeDelta: {x: -75, y: -4}
+  m_AnchoredPosition: {x: 35, y: 0}
+  m_SizeDelta: {x: -80, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &541845347
 MonoBehaviour:
@@ -1691,7 +1689,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 64452866}
         m_TargetAssemblyTypeName: VoronoiMeshUI, Assembly-CSharp
-        m_MethodName: OnTileSizeXSliderUpdated
+        m_MethodName: OnUpdateBothXYSize
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2269,7 +2267,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 15, y: -15}
-  m_SizeDelta: {x: 250, y: 395}
+  m_SizeDelta: {x: 250, y: 340}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &753566586
 GameObject:
@@ -2304,7 +2302,7 @@ RectTransform:
   m_Father: {fileID: 894040891}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2723,7 +2721,7 @@ GameObject:
   - component: {fileID: 793467637}
   - component: {fileID: 793467636}
   m_Layer: 5
-  m_Name: Tile Size X
+  m_Name: Tile Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2769,7 +2767,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'X: 0.00'
+  m_text: 0.00 x 0.00
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4190,7 +4188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1127055354
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5659,7 +5657,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 55}
+  m_SizeDelta: {x: 0, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1644562254
 GameObject:

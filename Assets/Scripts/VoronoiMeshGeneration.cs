@@ -243,9 +243,15 @@ public class VoronoiMeshGeneration : MonoBehaviour
         _tileSize.x = newSizeX;
     }
 
-    public void SetTiileSizeY(float newSizeY)
+    public void SetTileSizeY(float newSizeY)
     {
         _tileSize.y = newSizeY;
+    }
+
+    public void SetTileSize(float newSize)
+    {
+        SetTileSizeX(newSize);
+        SetTileSizeY(newSize);
     }
 
     public void SetOffsetColumns(bool offset)
