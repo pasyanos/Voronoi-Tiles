@@ -10,9 +10,12 @@ See the User Manual Section for more information on running the demo.
 
 Tile based terrain generation is a common approach to procedural terrain, but a major drawback is that it creates incredibly inorganic terrain. My project is a terrain generator that still relies on tiles while using Voronoi diagrams to create a more organic terrain generator. 
 
-## Demo User Manual
+## User Manual
 
 Information needed to operate the playable demo will go here.
+
+### Presentation Video [Here](https://www.youtube.com/watch?v=8Xx3i11P-_8)
+
 ## Background
 
 Much of this project is based on 
