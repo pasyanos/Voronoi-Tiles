@@ -1,5 +1,7 @@
 # Procedural Terrain Manipulation Using Voronoi Areas
+
 Caroline Pasyanos
+
 CSCI 716: Computational Geometry
 
 ### A playable demo is available [here](https://pasyanos.github.io/Voronoi-Tiles/)!
@@ -14,11 +16,11 @@ Tile based terrain generation is a common approach to procedural terrain, but a 
 
 Information needed to operate the playable demo will go here.
 
-### Presentation Video [Here](https://www.youtube.com/watch?v=8Xx3i11P-_8)
+## Presentation Video [Here](https://www.youtube.com/watch?v=8Xx3i11P-_8)
 
 ## Background
 
-Much of this project is based on 
+Much of this project is based on the developer blog [Tiles to Curves]() from independent game developer Ludomotion.
 
 ## Implementation Details
 
