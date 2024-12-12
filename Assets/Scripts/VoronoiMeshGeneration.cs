@@ -22,6 +22,7 @@ public class VoronoiMeshGeneration : MonoBehaviour
     [SerializeField][Range(0f, 0.5f)] private float _randomizePointFactor = 0.2f;
     public float randomizePointFactor { get { return _randomizePointFactor; } }
     [SerializeField][Range(0f, 0.5f)] private float _likeNeighborsRelaxationAmt = 0.3f;
+    public float likeNeighborRelaxation { get { return _likeNeighborsRelaxationAmt; } }
 
 
     [Space(10)]
@@ -250,6 +251,16 @@ public class VoronoiMeshGeneration : MonoBehaviour
     public void SetOffsetColumns(bool offset)
     {
         _offsetEvenColumns = offset;
+    }
+
+    public void SetPerlinAmount(float amount)
+    {
+        _randomizePointFactor = amount;
+    }
+
+    public void SetRelaxationAmt(float amount)
+    {
+        _likeNeighborsRelaxationAmt = amount;
     }
     #endregion
 

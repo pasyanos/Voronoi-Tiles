@@ -31,6 +31,11 @@ public class VoronoiMeshUI : MonoBehaviour
     [SerializeField] private Slider _sizeYSlider;
     [Space(10)]
     [SerializeField] private Toggle _offsetColumnToggle;
+    [Space(10)]
+    [SerializeField] private TextMeshProUGUI _perlinAmountText;
+    [SerializeField] private Slider _perlinAmountSlider;
+    [SerializeField] private TextMeshProUGUI _relaxationAmountText;
+    [SerializeField] private Slider _relaxationAmountSlider;
 
     private void Start()
     {
@@ -59,6 +64,14 @@ public class VoronoiMeshUI : MonoBehaviour
 
         _offsetColumnToggle.isOn = offsetCols;
 
+        float perlinFactor = meshGenerator.randomizePointFactor;
+        _perlinAmountSlider.value = perlinFactor;
+        SetPerlinAmtText(perlinFactor);
+
+        float neighborRelaxation = meshGenerator.likeNeighborRelaxation;
+        _relaxationAmountSlider.value = neighborRelaxation;
+        SetRelaxationAmtText(neighborRelaxation);
+
         _tileMapGrid.cellSize = new Vector2(_tileHeight, _tileHeight);
     }
 
@@ -76,7 +89,6 @@ public class VoronoiMeshUI : MonoBehaviour
     public void OnRowSliderUpdated()
     {
         float val = _rowsSlider.value;
-        // Debug.LogErrorFormat("Rows set to {0}", val);
         SetRowUIText((int)val);
         meshGenerator.SetRowDimensions((int)val);
     }
@@ -84,7 +96,6 @@ public class VoronoiMeshUI : MonoBehaviour
     public void OnColumnSliderUpdated()
     {
         float val = _columnsSlider.value;
-        // Debug.LogErrorFormat("Cols set to {0}", val);
         SetColumnTextUI((int)val);
         meshGenerator.SetColumnDimensions((int)val);
     }
@@ -106,8 +117,21 @@ public class VoronoiMeshUI : MonoBehaviour
     public void OnToggleOffsetColumns()
     {
         bool val = _offsetColumnToggle.isOn;
-        // Debug.LogErrorFormat("offset: {0}", val);
         meshGenerator.SetOffsetColumns(val);
+    }
+
+    public void SetPerlinNoise()
+    {
+        float val = _perlinAmountSlider.value;
+        meshGenerator.SetPerlinAmount(val);
+        SetPerlinAmtText(val);
+    }
+
+    public void SetRelaxationAmt()
+    {
+        float val = _relaxationAmountSlider.value;
+        meshGenerator.SetRelaxationAmt(val);
+        SetRelaxationAmtText(val);
     }
     #endregion // Public Facing Methods 
 
@@ -151,6 +175,18 @@ public class VoronoiMeshUI : MonoBehaviour
     private void SetSizeYUIText(float val)
     {
         _tileSizeYText.text = string.Format("Y: {0:0.00}", val);
+    }
+
+    private void SetPerlinAmtText(float val)
+    {
+        int percent = Mathf.RoundToInt(100 * val);
+        _perlinAmountText.text = string.Format("Perlin Noise: {0}%", percent);
+    }
+
+    private void SetRelaxationAmtText(float val)
+    {
+        int percent = Mathf.RoundToInt(100 * val);
+        _relaxationAmountText.text = string.Format("Point Relax: {0}%", percent);
     }
     #endregion
 }
