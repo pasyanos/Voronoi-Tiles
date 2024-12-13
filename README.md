@@ -147,6 +147,11 @@ Once each tile center is processed, I query the mesh storage class for an array 
 
 ![A rendered Voronoi terrain](images/voronoi_default_settings.png)
 
+## Program Efficiency
+
+I wrote this code with efficiency in mind, but the reality is that both Voronoi areas and mesh generation are expensive operations on large enough inputs. I capped the number of rows and columns at a maximum of 40 (1600 points) which runs fairly well in the build. The program can support larger input sizes, but performance may be affected.
+As this is a terrain generation tool, I realistically think these expensive operations would be pre-computed and stored, or loaded asynchronously. Therefore full and complete efficiency is not necessary.
+
 ## Tools
 
 - Unity Engine
