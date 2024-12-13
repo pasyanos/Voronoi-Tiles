@@ -109,11 +109,19 @@ Once it is run, each Voronoi area in the diagram can be queried by the site's po
 
 ### Step 4: Mesh Generation
 
+I created several supporting classes to store mesh information before I am ready to render the mesh. At the very least, Unity meshes need a list of vertices and a list of indices that dictate how the list of vertices is triangulated.
+
 Mesh generation proceeds as follows:
 
-```
-pseudocode here.
-```
+For each tile center:
+- query the voronoi diagram for the voronoi area (returned as a list of points)
+- sort list of points in clockwise order (Fortune's algorithm does not guarantee point winding order)
+- triangulate voronoi area polygon using [Fan Triangulation](https://en.wikipedia.org/wiki/Fan_triangulation)
+- assign terrain color to each vertex
+- for each line segment in the polygon, create a vertical wall from two triangles. Assign wall color to each vertex.
+- store vertex, index, and color information in mesh storage class.
+
+Once each tile center is processed, I query the mesh storage class for an array of vertices, indices, and colors and pass this to a new [Mesh](https://docs.unity3d.com/ScriptReference/Mesh.html) object. I assign this to an instance of a Unity [Mesh Filter](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MeshFilter.html), and the final terrain is rendered in scene.
 
 ## Tools
 
@@ -125,13 +133,13 @@ pseudocode here.
 
 - 10/27/24 - Basic tile generation with placeholder assets finalized. First Github pages build published.
 - 11/16/24 - Voronoi area generation added.
-- 12/4/2024 - Mesh generation using Voronoi areas. Build updated.
-- 12/7/2024 - UI updates, build updated.
-- 12/11-12/12/2024 - Added UI hooks to demo to allow adjustment of parameters. Final build.
+- 12/04/24 - Mesh generation using Voronoi areas. Build updated.
+- 12/07/24 - UI updates, build updated.
+- 12/11/24 - Added UI hooks to demo to allow adjustment of parameters. F
+- 12/12/24 - Final build.
+- 12/13/24 - Final documentation.
 
 ## References
-
-This list may grow as the project continues.
 
 - [Ludomotion: Tiles to Curves](https://www.ludomotion.com/blogs/tiles-to-curves/)
 - [Ludomotion: Generating World Maps for Unexplored 2](https://www.ludomotion.com/blogs/generating-world-maps/)
@@ -142,3 +150,4 @@ This list may grow as the project continues.
 - [The Fascinating World of Voronoi Diagrams](https://builtin.com/data-science/voronoi-diagram)
 - [Fortune's Algorithm: An Intuitive Explanation](https://jacquesheunis.com/post/fortunes-algorithm/)
 - [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise)
+- [Fan Triangulation](https://en.wikipedia.org/wiki/Fan_triangulation)
