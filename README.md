@@ -78,11 +78,12 @@ Before beginning generation, the algorithm creates a 2D look-up table of float w
 Rather than a linear interpolation, I make use of a [Unity animation curve](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/AnimationCurve.html). The values for the x and y axis are multiplied together then stored in the lookup table.
 Like the terrain type setting, the animation curve is exposed in the Unity editor, but cannot be changed in the build.
 
-First, each edge tile is filled in with water.
+Procedural tile generation proceeds as follows:
+- First, each edge tile is filled in with water.
+- Next, for each internal tile, I sample a 2D Perlin noise texture to get a value in the range [0,1], then weigh it by the value stored in the look-up table. I convert this value to an integer in the range [0, 100]. Anything below 7 is a water tile. The range [7, 30) is a ground tile, [30, 45) is low hill, and anything 45 or above is a high mountain.
+- Finally, in a second pass through every tile, I go through and change all ground tiles that have at least one water neighbor to shore tiles to give it even more of an island look. Hill or mountain tiles that border water will remain, to mimic the look of islands that have cliff edges, but it is unlikely.
 
-Next, for each internal tile, I sample a 2D Perlin noise texture to get a value in the range [0,1], then weigh it by the value stored in the look-up table. I convert this value to an integer in the range [0, 100]. Anything below 7 is a water tile. The range [7, 30) is a ground tile, [30, 45) is low hill, and anything 45 or above is a high mountain.
-
-Finally, in a second pass through every tile, I go through and change all ground tiles that have at least one water neighbor to shore tiles to give it even more of an island look. Hill or mountain tiles that border water will remain, to mimic the look of islands that have cliff edges, but it is unlikely.
+A 2D map of the underlying procedural tile map is displayed in the upper right corner when UI is toggled on (see the **User Manual** section).
 
 ### Step 2: Tile Center Manipulation
 
@@ -94,7 +95,7 @@ Here is what the terrain looks like without any noise or relaxation applied (wit
 
 ![Terrain with no noise](images/voronoi_offset_no_noise.png)
 
-I initialize a 2D array of Vector2s with the dimensions rows x columns representing the ***local*** offset from the center of the tile. The default is (0, 0) - no offset.
+I initialize a 2D array of Vector2s with the dimensions rows x columns representing the ***local*** offset from the center of the tile. The default is (0, 0), representing no offset from the global position.
 Following Ludomotion’s post, tile centers are augmented in three ways.
 
 1. Offsetting even columns
@@ -122,17 +123,25 @@ Once it is run, each Voronoi area in the diagram can be queried by the site's po
 
 ### Step 4: Mesh Generation
 
-I created several supporting classes to store mesh information before I am ready to render the mesh. At the very least, Unity meshes need a list of vertices and a list of indices that dictate how the list of vertices is triangulated.
+**Mesh Generation and Rendering in Unity**: At the very least, Unity meshes need a list of vertices and a list of indices that dictate how the list of vertices is triangulated. 
+
+To render my terrain mesh, I rely on these two required inputs as well as the optional vertex color attribute. 
+Unity's standard shader (the default shader for materials) does NOT support vertex color, so in order to render this attribute, I use an unlit particle shader which does.
+
+I created several supporting classes to store mesh information before I am ready to render the mesh (I refer to these as mesh storage classes). 
+
+Also, by default, only one side of the triangle face (the front face) is rendered. 
+In Unity, the front face of a triangle is indicated by a clockwise order of points, so it is up to my program to ensure the correct winding order when generating mesh information.
 
 Mesh generation proceeds as follows:
 
 For each tile center:
-- query the voronoi diagram for the voronoi area (returned as a list of points)
-- sort list of points in clockwise order (Fortune's algorithm does not guarantee point winding order)
-- triangulate voronoi area polygon using [Fan Triangulation](https://en.wikipedia.org/wiki/Fan_triangulation)
-- assign terrain color to each vertex
-- for each line segment in the polygon, create a vertical wall from two triangles. Assign wall color to each vertex.
-- store vertex, index, and color information in mesh storage class.
+- query the voronoi diagram for the Voronoi area (returned as a list of points)
+- sort list of points in clockwise order (this implementation of Fortune's algorithm does not guarantee point winding order)
+- triangulate Voronoi area polygon using [Fan Triangulation](https://en.wikipedia.org/wiki/Fan_triangulation)
+- assign terrain color to each vertex of the Voronoi area polygon
+- for each line segment in the polygon, create a vertical wall from two triangles, then ssign wall color to each vertex.
+- Add vertex, index, and color information for the polygon and each wall to the mesh storage class. 
 
 Once each tile center is processed, I query the mesh storage class for an array of vertices, indices, and colors and pass this to a new [Mesh](https://docs.unity3d.com/ScriptReference/Mesh.html) object. I assign this to an instance of a Unity [Mesh Filter](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MeshFilter.html), and the final terrain is rendered in scene.
 
