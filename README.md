@@ -17,6 +17,12 @@ Tile based terrain generation is a common approach to procedural terrain, but a 
 
 The goal was to expose the most impactful settings to the user to illustrate the flexibility of the system. 
 
+Pressing the tab key toggles the settings menu and the tile map key on or off.
+
+The camera can be rotated using the left and right arrow keys OR the A and D keys to see all sides of the terrain.
+
+![One possible configuration of settings](images/voronoi_settings.png)
+
 ### Map Dimensions:
 
 Set the number of tiles to generate. Supports a range between 10 and 40 tiles in either direction. Rows and columns can be seperately assigned.
@@ -81,6 +87,13 @@ Finally, in a second pass through every tile, I go through and change all ground
 ### Step 2: Tile Center Manipulation
 
 The key to creating organic looking terrain is seeding a 2D plane with points for each tile, then generating a Voronoi area. Augmenting the tile centers before generating the diagram is an incredibly necessary step for achieving organic maps. Without these augmentations, the resulting Voronoi diagram would just be a grid of uniform shapes.
+
+Here is what the terrain looks like without any noise or relaxation applied (without and with the column offset):
+
+![Terrain with no noise](images/voronoi_no_offset_no_noise.png)
+
+![Terrain with no noise](images/voronoi_offset_no_noise.png)
+
 I initialize a 2D array of Vector2s with the dimensions rows x columns representing the ***local*** offset from the center of the tile. The default is (0, 0) - no offset.
 Following Ludomotion’s post, tile centers are augmented in three ways.
 
@@ -122,6 +135,8 @@ For each tile center:
 - store vertex, index, and color information in mesh storage class.
 
 Once each tile center is processed, I query the mesh storage class for an array of vertices, indices, and colors and pass this to a new [Mesh](https://docs.unity3d.com/ScriptReference/Mesh.html) object. I assign this to an instance of a Unity [Mesh Filter](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MeshFilter.html), and the final terrain is rendered in scene.
+
+![A rendered Voronoi terrain](images/voronoi_default_settings.png)
 
 ## Tools
 
